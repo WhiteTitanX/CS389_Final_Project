@@ -1,4 +1,4 @@
-# (app name)
+# Overslayer (wip)
 ## Team
 * Alex Ceremisinovs: ac25249n@pace.edu
 * Aleksandr Gallagher: ag11412p@pace.edu
@@ -12,7 +12,7 @@
 (idea proposal link)
 
 ## Product Backlog
-(product backlog link)
+https://docs.google.com/spreadsheets/d/1XMmwbVlVh8gB1OpuBe0HGFY8i2yRfqk7um02B8QV3A8
 
 ## Sprint Backlogs
 * (Sprint 1 Backlog link)
@@ -25,7 +25,7 @@
 (sprint retrospectives links)
 
 ## Software Requirements Specification Document
-(Software Requirements Specification Document link)
+https://docs.google.com/document/d/1a27pMgVQ1oVaV9c7KbvthAQ4nC_OZsvShyfhnUAnb-U/
 
 ## Project Presentation
 (project presentation links)
