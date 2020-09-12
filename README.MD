@@ -1,4 +1,4 @@
-# Overslayer (wip)
+# Overseer (wip)
 ## Team
 * Alex Ceremisinovs: ac25249n@pace.edu
 * Aleksandr Gallagher: ag11412p@pace.edu
