@@ -9,12 +9,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".BuildingSelectActivity"
+            android:label = "@string/app_name"
+            android:parentActivityName=".PropertySelectActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=
+                    "com.cs389f20.diamonds.PropertySelectActivity" />
+        </activity>
+        <activity android:name=".PropertySelectActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity"
+            android:label = "@string/app_name"
+            android:parentActivityName=".BuildingSelectActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=
+                    "com.cs389f20.diamonds.BuildingSelectActivity" />
         </activity>
     </application>
 

@@ -3,4 +3,7 @@
     <string name="header">Number of People in Miller</string>
     <string name="last_updated_initial_value">Last updated 5 minutes ago</string>
     <string name="amount_initial_value">15</string>
+    <string name="select_a_property">Select a property</string>
+    <string name="select_a_building">Select a building</string>
+    <string name="temp_button_text">Temp Button to Switch</string>
 </resources>
