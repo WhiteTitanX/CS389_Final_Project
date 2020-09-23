@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BuildingSelectActivity extends AppCompatActivity {
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = BuildingSelectActivity.class.getSimpleName();
     public static final String EXTRA_BUILDING = "com.cs389f20.diamonds.extra.BUILDING";
     public static final int TEXT_REQUEST = 1;
     private String propertyName;

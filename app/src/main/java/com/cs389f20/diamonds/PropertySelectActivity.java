@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PropertySelectActivity extends AppCompatActivity {
-    private static final String LOG_TAG =  MainActivity.class.getSimpleName();
+    private static final String LOG_TAG =  PropertySelectActivity.class.getSimpleName();
     public static final String EXTRA_PROPERTY =   "com.cs389f20.diamonds.extra.PROPERTY";
     public static final int TEXT_REQUEST = 1;
 
@@ -29,7 +29,7 @@ public class PropertySelectActivity extends AppCompatActivity {
 
         //TODO: connect to database
 
-        setupMaps(); //When this activity is replaced, is all the cache (maps / lists) destroyed? then caching it might not be worth it.
+        setupMaps(); //should we send the data via the intents? state might be destroyed otherwise. or get the data on each call, and dont cache it
         //TODO: if user comes back to this activity and there is an update to the db (a new property or building), when need to update the map / property object
 
 

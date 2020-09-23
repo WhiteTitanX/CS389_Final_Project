@@ -9,4 +9,13 @@
     <string name="button_show_history">Show History</string>
     <string name="button_display_graph">Display Graph</string>
     <string name="text_notify">Notify me when capacity reaches</string>
+    <string name="history_searchText_initial">search</string>
+    <string name="button_filter_text">Filter</string>
+    <string name="history_title">%1$s History</string>
+    <string name="graph_title">%1$s Graph</string>
+    <string name="graph_enter_date_text">Enter Date</string>
+    <string name="graph_from_text">From</string>
+    <string name="graph_to_text">to</string>
+    <string name="graph_create_graph_text">Create Graph</string>
+    <string name="graph_flip_text">Flip to Landscape</string>
 </resources>

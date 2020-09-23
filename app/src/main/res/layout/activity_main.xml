@@ -66,6 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="256dp"
+        android:onClick="launchHistoryActivity"
         android:text="@string/button_show_history"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,6 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:onClick="launchGraphActivity"
         android:text="@string/button_display_graph"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,6 +91,7 @@
         android:ems="10"
         android:inputType="number"
         app:layout_constraintBaseline_toBaselineOf="@+id/textNotify"
-        app:layout_constraintStart_toEndOf="@+id/textNotify" />
+        app:layout_constraintStart_toEndOf="@+id/textNotify"
+        android:autofillHints="" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
