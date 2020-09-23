@@ -18,4 +18,5 @@
     <string name="graph_to_text">to</string>
     <string name="graph_create_graph_text">Create Graph</string>
     <string name="graph_flip_text">Flip to Landscape</string>
+    <string name="force_refresh_text">Force Refresh</string>
 </resources>

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -63,5 +64,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GraphActivity.class);
         intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, buildingName);
         startActivity(intent);
+    }
+
+    public void refreshCount(View v)
+    {
+        //for debug purposes. will scrap when we get it auto updating
+        Toast.makeText(getApplicationContext(), "Updated to latest count", Toast.LENGTH_SHORT).show();
+
     }
 }
