@@ -24,6 +24,8 @@ public class PropertySelectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_property_select);
+        getSupportActionBar().hide();
+
 
         //TODO: connect to database
 
@@ -57,7 +59,7 @@ public class PropertySelectActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Property selected. Launching BuildingSelectActivity.");
         Intent intent = new Intent(this, BuildingSelectActivity.class);
      //   String message = editTextMessage.getText().toString();
-        String message = ""; //TODO: get selection from property activity (on click?) as the message
+        String message = "Pace University"; //TODO: get selection from property activity (on click?) as the message
         //TODO: do we send an array with all the buildings (multiple arrays)? a serializable set of data?
         intent.putExtra(EXTRA_PROPERTY, message);
 

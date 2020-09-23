@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".BuildingSelectActivity"
-            android:label = "@string/app_name"
+            android:label = "building"
             android:parentActivityName=".PropertySelectActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

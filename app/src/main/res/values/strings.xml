@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Overseer</string>
-    <string name="header">Number of People in Miller</string>
+    <string name="building_info_header">Number of People in %1$s</string>
     <string name="last_updated_initial_value">Last updated 5 minutes ago</string>
-    <string name="amount_initial_value">15</string>
+    <string name="amount_initial_value">0</string>
     <string name="select_a_property">Select a property</string>
     <string name="select_a_building">Select a building</string>
-    <string name="temp_button_text">Temp Button to Switch</string>
+    <string name="temp_button_text">Pace University (temp)</string>
+    <string name="button_show_history">Show History</string>
+    <string name="button_display_graph">Display Graph</string>
+    <string name="text_notify">Notify me when capacity reaches</string>
 </resources>
