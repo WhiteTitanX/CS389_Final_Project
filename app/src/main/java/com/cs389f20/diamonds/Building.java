@@ -1,6 +1,6 @@
 package com.cs389f20.diamonds;
 
-public class Building
+public class Building implements java.io.Serializable
 {
     public String name;
     public Property property;

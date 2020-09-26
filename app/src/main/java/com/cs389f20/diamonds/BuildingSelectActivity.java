@@ -1,44 +1,44 @@
 package com.cs389f20.diamonds;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.List;
-import java.util.Map;
 
 public class BuildingSelectActivity extends AppCompatActivity {
-    private static final String LOG_TAG = BuildingSelectActivity.class.getSimpleName();
+    private static final String LOG_TAG = BuildingSelectActivity.class.getSimpleName(), SERIALIZABLE_KEY = "property";
     public static final String EXTRA_BUILDING = "com.cs389f20.diamonds.extra.BUILDING";
     public static final int TEXT_REQUEST = 1;
-    private String propertyName;
+    private Property property;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_building_select);
-        //if we are recreating a previous saved state (the back button on mainactivity)
+
+        //if we are recreating a previous saved state (the back button on MainActivity)
         if (savedInstanceState != null) {
-            String _propertyName = savedInstanceState.getString("property_name");
-            setTitle(_propertyName);
-            propertyName = _propertyName;
+            property = (Property) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
         } else {
             Intent intent = getIntent();
-            propertyName = intent.getStringExtra(PropertySelectActivity.EXTRA_PROPERTY);
-            setTitle(propertyName);
+            property = (Property) intent.getSerializableExtra(PropertySelectActivity.EXTRA_PROPERTY);
         }
-        //TODO: get all buildings listed under propertyName (from db), and display it
-        // or: already store all buildings (and properties) on first connect to db (when app first launches), then just display them now from a map?
+        if (property == null) {
+            Log.e(LOG_TAG, "Property is null in onCreate");
+            Toast.makeText(getApplicationContext(), "Error: Cannot get property data", Toast.LENGTH_LONG).show();
+            return;
+        }
+        setTitle(property.name);
 
+        List<Building> buildings = property.getBuildings();
+        //TODO: create a button (with contentDescription of building name) for each building in buildings list
 
         Log.d(LOG_TAG, "-------");
         Log.d(LOG_TAG, "onCreate");
@@ -47,8 +47,18 @@ public class BuildingSelectActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        if (propertyName != null)
-            savedInstanceState.putString("property_name", propertyName);
+        if (property != null)
+            savedInstanceState.putSerializable(SERIALIZABLE_KEY, property);
+    }
+
+    //If we use the top left arrow or the bottom left arrow, we want to save the state
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()== android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void launchMainActivity(View v) {
@@ -64,10 +74,17 @@ public class BuildingSelectActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error: No building assigned to that button", Toast.LENGTH_LONG).show();
             return;
         }
-        Log.d(LOG_TAG, "Building (name: " + button.getContentDescription().toString() + ") selected. Launching MainActivity.");
+        String buildingName = button.getContentDescription().toString();
+        Building building = property.getBuilding(buildingName);
+        if(building == null) {
+            Log.e(LOG_TAG, "Trying to launch MainActivity when buildingName of " + buildingName + " isn't part of buildings list in property " + property.name);
+            Toast.makeText(getApplicationContext(), "Error: Cannot find that building in that property", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Log.d(LOG_TAG, "Building (name: " + buildingName + ") selected. Launching MainActivity.");
         Intent intent = new Intent(this, MainActivity.class);
-        String message = button.getContentDescription().toString();
-        intent.putExtra(EXTRA_BUILDING, message);
+        intent.putExtra(EXTRA_BUILDING, building);
+
         startActivity(intent);
     }
 }

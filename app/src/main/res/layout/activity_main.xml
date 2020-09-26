@@ -90,7 +90,7 @@
         android:layout_marginStart="8dp"
         android:autofillHints="0"
         android:ems="10"
-        android:hint="@string/amount_initial_value"
+        android:hint="@string/amount_zero"
         android:inputType="number"
         android:textAlignment="center"
         app:layout_constraintBaseline_toBaselineOf="@+id/textNotify"
