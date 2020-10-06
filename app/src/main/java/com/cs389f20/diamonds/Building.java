@@ -14,4 +14,9 @@ public class Building implements java.io.Serializable
         numOfDetectors = detectors;
         currentNumberOfPeople = currentNum;
     }
+
+    public void setPeople(int newpeople)
+    {
+        currentNumberOfPeople = newpeople;
+    }
 }

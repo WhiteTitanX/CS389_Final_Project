@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cs389f20.diamonds">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,26 +11,26 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".GraphActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".BuildingActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.cs389f20.diamonds.MainActivity" />
+                android:value="com.cs389f20.diamonds.BuildingActivity" />
         </activity>
         <activity
             android:name=".HistoryActivity"
+            android:parentActivityName=".BuildingActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cs389f20.diamonds.BuildingActivity" />
+        </activity>
+        <activity
+            android:name=".BuildingSelectActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cs389f20.diamonds.MainActivity" />
         </activity>
-        <activity
-            android:name=".BuildingSelectActivity"
-            android:parentActivityName=".PropertySelectActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.cs389f20.diamonds.PropertySelectActivity" />
-        </activity>
-        <activity android:name=".PropertySelectActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".BuildingActivity"
             android:parentActivityName=".BuildingSelectActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

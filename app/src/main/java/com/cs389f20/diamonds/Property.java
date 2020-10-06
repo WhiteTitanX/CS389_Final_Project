@@ -5,20 +5,12 @@ import java.util.List;
 
 public class Property implements java.io.Serializable {
     public String name;
-    public int numOfBuildings;
     private List<Building> buildings;
     //Location?
 
-    public Property(String _name, int _num) {
+    public Property(String _name) {
         name = _name;
-        numOfBuildings = _num;
         buildings = new ArrayList<>();
-    }
-
-    public Property(String _name, int _num, List<Building> b) {
-        name = _name;
-        numOfBuildings = _num;
-        buildings = b;
     }
 
     public List<Building> getBuildings() {
@@ -32,19 +24,33 @@ public class Property implements java.io.Serializable {
         return null;
     }
 
-    public void addBuildings(List<Building> bs) {
-        buildings = bs;
-    }
-
     public void addBuilding(Building b) {
         buildings.add(b);
+    }
+
+    public boolean updateBuilding(String name, int newCount)
+    {
+      try {
+          getBuilding(name).setPeople(newCount);
+          return true;
+      }
+      catch (NullPointerException e){
+          return  false;
+      }
     }
 
     public void removeBuilding(Building b) {
         buildings.remove(b);
     }
 
-    public boolean searchFor(Building b) {
+    public boolean contains(Building b) {
         return buildings.contains(b);
+    }
+
+    public boolean contains(String name) {
+        for (int i = 0; i < buildings.size(); i++)
+            if (buildings.get(i).name.equalsIgnoreCase(name))
+                return true;
+        return false;
     }
 }

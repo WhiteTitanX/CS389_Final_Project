@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Overseer</string>
+    <string name="app_name">Tally</string>
     <string name="building_info_header">Number of People in %1$s</string>
     <string name="last_updated_initial_value">Last updated 5 minutes ago</string>
     <string name="amount_initial_value">%1$d</string>
