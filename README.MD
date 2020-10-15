@@ -1,4 +1,4 @@
-# Tally
+# EntryTrack
 ## Team
 * Alex Ceremisinovs: ac25249n@pace.edu
 * Aleksandr Gallagher: ag11412p@pace.edu
@@ -23,7 +23,7 @@ An app that can count and display the number of people currently in a building t
 
 ## Sprint Retrospectives
 * [Sprint 1 Retrospective](https://docs.google.com/document/d/1Vh0P9lstI7sZ2NXvhbWPca5nM-FRonA6wD22GNVJy2o/edit)
-* [Sprint 2 Retrospective]()
+* [Sprint 2 Retrospective](https://docs.google.com/document/d/1UmDSfwCmIA3K1f4C-oT9rJ2TPkaKlqOn9NNIMctv8lM/edit)
 * [Sprint 3 Retrospective]()
 * [Sprint 4 Retrospective]()
 * [Sprint 5 Retrospective]()
