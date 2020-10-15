@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BuildingSelectActivity extends AppCompatActivity {
     private static final String LOG_TAG = BuildingSelectActivity.class.getSimpleName(), SERIALIZABLE_KEY = "property";
@@ -19,8 +20,8 @@ public class BuildingSelectActivity extends AppCompatActivity {
     public static final int TEXT_REQUEST = 1;
     private Property property;
     private static BuildingSelectActivity bsa;
-    public BuildingSelectActivity()
-    {
+
+    public BuildingSelectActivity() {
         bsa = this;
     }
 
@@ -32,6 +33,16 @@ public class BuildingSelectActivity extends AppCompatActivity {
         //if we are recreating a previous saved state (the back button on MainActivity)
         if (savedInstanceState != null) {
             property = (Property) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
+            //Test if an update in the database has happened
+            MainActivity ma = MainActivity.getInstance();
+            long time = TimeUnit.MILLISECONDS.toMinutes(ma.getDatabase().getLastUpdated());
+            if (time < 1) //just refreshed. get the updated count
+            {
+                Log.d(LOG_TAG, "Updating list of buildings for selection for " + property.name);
+                property = ma.getProperty(property);
+                if (property == null)
+                    finish(); //the building was removed from the database
+            }
         } else {
             Intent intent = getIntent();
             property = (Property) intent.getSerializableExtra(MainActivity.EXTRA_PROPERTY);
@@ -43,14 +54,7 @@ public class BuildingSelectActivity extends AppCompatActivity {
         }
         setTitle(property.name);
 
-        List<Building> buildings = property.getBuildings();
-        //TODO: create a button (with contentDescription of building name) for each building in buildings list
-
-        DrawButtons.drawButtons(property.getBuildings().iterator(), (RelativeLayout) findViewById(R.id.buildingSelectLayout));
-
-
-        Log.d(LOG_TAG, "-------");
-        Log.d(LOG_TAG, "onCreate");
+        updateButtons();
     }
 
     @Override
@@ -63,7 +67,7 @@ public class BuildingSelectActivity extends AppCompatActivity {
     //If we use the top left arrow or the bottom left arrow, we want to save the state
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId()== android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -80,7 +84,7 @@ public class BuildingSelectActivity extends AppCompatActivity {
         button = (ImageButton) v;
 
         Building building = property.getBuilding(buildingName);
-        if(building == null) {
+        if (building == null) {
             Log.e(LOG_TAG, "Trying to launch MainActivity when buildingName of " + buildingName + " isn't part of buildings list in property " + property.name);
             Toast.makeText(getApplicationContext(), "Error: Cannot find that building in that property", Toast.LENGTH_LONG).show();
             return;
@@ -92,8 +96,11 @@ public class BuildingSelectActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public static BuildingSelectActivity getInstance()
-    {
+    public static BuildingSelectActivity getInstance() {
         return bsa;
+    }
+
+    public void updateButtons() {
+        DrawButtons.drawButtons(property.getBuildings().iterator(), (RelativeLayout) findViewById(R.id.buildingSelectLayout));
     }
 }

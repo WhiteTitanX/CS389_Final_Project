@@ -4,17 +4,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.concurrent.TimeUnit;
+
 /*
 Displays the building info screen
  */
 public class BuildingActivity extends AppCompatActivity {
     private static final String LOG_TAG = BuildingActivity.class.getSimpleName(), SERIALIZABLE_KEY = "building";
     private Building building;
+    private boolean isRunning;
+    private Handler handler;
+    private Runnable lastUpdateTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +43,21 @@ public class BuildingActivity extends AppCompatActivity {
         }
         setTitle(building.name);
 
-        //Update/display info
-        TextView header = findViewById(R.id.textHeader);
-        header.setText(getString(R.string.building_info_header, building.name));
-        TextView people = findViewById(R.id.textAmount);
-        people.setText(getString(R.string.amount_initial_value, building.currentNumberOfPeople));
-        //TODO: should we updated info from db, instead of using the cache?
+        //Display info (from cache)
+        displayNameAndAmount();
 
+        //Set recurring task to update "last updated" every minute and update count if a database refresh happens
+        handler = new Handler(Looper.getMainLooper());
+        lastUpdateTask = new Runnable() {
+            @Override
+            public void run() {
+                updateAmountAndLastUpdated();
+                handler.postDelayed(this, TimeUnit.MINUTES.toMillis(1));
+            }
+        };
+        handler.post(lastUpdateTask);
+        //Note: if we just launched the app, we will update the building again in updateAAndLU even though we don't need to.
+        //this really isn't a big problem, just worth noting
     }
 
     @Override
@@ -75,9 +91,43 @@ public class BuildingActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void refreshCount(View v) {
-        //for debug purposes. will scrap when we get it auto updating
-        Toast.makeText(getApplicationContext(), "Updated to latest count", Toast.LENGTH_SHORT).show();
+    private void displayNameAndAmount() {
+        displayName();
+        displayAmount();
+    }
 
+    private void displayName() {
+        TextView header = findViewById(R.id.textHeader);
+        header.setText(getString(R.string.building_info_header, building.name));
+    }
+
+    private void displayAmount() {
+        TextView people = findViewById(R.id.textAmount);
+        people.setText(getString(R.string.people_amount, building.currentNumberOfPeople));
+    }
+
+    public void updateAmountAndLastUpdated() {
+        Log.d(LOG_TAG, "Updating last updated for " + building.name);
+        TextView lastUpdated = findViewById(R.id.textlastUpdated);
+        MainActivity ma = MainActivity.getInstance();
+        long time = TimeUnit.MILLISECONDS.toMinutes(ma.getDatabase().getLastUpdated());
+        if (time < 1) //just refreshed. get the updated count
+        {
+            Log.d(LOG_TAG, "Updating amount (count) for " + building.name);
+            building = ma.getBuilding(building);
+            if (building == null)
+                finish(); //the building was removed from the database
+            displayAmount();
+            lastUpdated.setText(getString(R.string.last_updated_now));
+        } else {
+            String unit = (time == 1) ? "minute" : "minutes";
+            lastUpdated.setText(getString(R.string.last_updated_time, time, unit));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(lastUpdateTask);
     }
 }

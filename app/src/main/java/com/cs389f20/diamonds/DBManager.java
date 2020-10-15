@@ -1,6 +1,7 @@
 package com.cs389f20.diamonds;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -10,9 +11,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -21,24 +24,15 @@ public class DBManager
     private RequestQueue queue;
     private MainActivity ma;
     private static final String LOG_TAG = DBManager.class.getSimpleName(),  ACCESS_TOKEN = "tlbJzoaAl6m81uXG3xU76zIIiVthlym3jBP94Q90";
+    private long lastUpdated;
+
+    private List<Property> properties;
     public DBManager(MainActivity main)
     {
         ma = main;
     }
 
-    public List<Building> getBuildings(Property p)
-    {
-        //returns the updated List<Building> for a property with any new values (and maybe even keys?)
 
-
-        return null;
-    }
-
-    public List<Property> getProperties()
-    {
-        //returns a list of properties ???
-        return null;
-    }
 
 
     public void connectToDatabase()
@@ -53,13 +47,14 @@ public class DBManager
 
                     @Override
                     public void onResponse(JSONObject response) {
-                       ma.storeData(response);
+                       lastUpdated = System.currentTimeMillis();
+                        ma.storeData(response);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(LOG_TAG, "ERROR: Couldn't connect to database ");
-
+                        Toast.makeText(ma.getApplicationContext(), "Can't connect to the internet.", Toast.LENGTH_LONG).show();
                         error.printStackTrace();
                     }
                 }) {
@@ -78,5 +73,10 @@ public class DBManager
     public RequestQueue getQueue()
     {
         return queue;
+    }
+
+    public long getLastUpdated()
+    {
+        return System.currentTimeMillis() - lastUpdated;
     }
 }

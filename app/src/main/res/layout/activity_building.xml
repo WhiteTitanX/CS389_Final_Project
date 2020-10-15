@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="@string/amount_initial_value"
+        android:text="@string/people_amount"
         android:textAlignment="center"
         android:textSize="36sp"
         android:textStyle="bold"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/last_updated_initial_value"
+        android:text="@string/last_updated_time"
         android:textAlignment="center"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,21 +95,5 @@
         android:textAlignment="center"
         app:layout_constraintBaseline_toBaselineOf="@+id/textNotify"
         app:layout_constraintStart_toEndOf="@+id/textNotify" />
-
-    <Button
-        android:id="@+id/buttonRefreshCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:onClick="refreshCount"
-        android:text="@string/force_refresh_text"
-        android:textSize="12sp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textlastUpdated" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

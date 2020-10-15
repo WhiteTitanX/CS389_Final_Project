@@ -2,39 +2,41 @@ package com.cs389f20.diamonds;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
     public static final String LOG_TAG = MainActivity.class.getSimpleName(), SERIALIZABLE_KEY = "properties";
     public static final String EXTRA_PROPERTY = "com.cs389f20.diamonds.extra.PROPERTY";
-    public static final int TEXT_REQUEST = 1;
+    public static final int TEXT_REQUEST = 1, REFRESH_INTERVAL = 5;
 
     private HashMap<String, Property> properties;
     private DBManager db;
     private static MainActivity ma;
+    private Handler handler;
+    private Runnable dbUpdater;
 
-    public MainActivity()
-    {
+    public MainActivity() {
         ma = this;
     }
 
-    //TODO: Loading Screen (?)
-    //TODO: Can't connect to internet screen/error message (already in onError in DBManager?)
-    //TODO: cache DatabaseManager (like props map? ) ?
+    //TODO: When can't connect to internet, make a task to try every 5 seconds, then remove that task. (in onError in DBManager?)
+    //TODO: store an array of ints in Building for last 24 hours. each value is either 10 or 5 minutes apart.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,19 +44,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-
         db = new DBManager(this);
 
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
         if (savedInstanceState != null) {
             properties = (HashMap) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
-            //TODO: see if the database has been updated. should we store JSONObject in savedInstance, then test to see if new one is equal to old?
-
+            findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
+            //need to update property selection buttons (not a priority as only one property right now)
         } else {
             properties = new HashMap<>();
+            findViewById(R.id.propertySelectHeader).setVisibility(View.INVISIBLE);
+            findViewById(R.id.loadBar).setVisibility(View.VISIBLE);
+            //Connect to the database
             db.connectToDatabase();
+            //Sets up the recurring task of getting updated values from the database every REFRESH_INTERVAL. Only called on first time starting the app.
+            handler = new Handler(Looper.getMainLooper());
+            dbUpdater = new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(LOG_TAG, "Connecting to database and updating data");
+                    db.connectToDatabase();
+                    handler.postDelayed(this, TimeUnit.MINUTES.toMillis(REFRESH_INTERVAL));
+                }
+            };
+            handler.postDelayed(dbUpdater, TimeUnit.MINUTES.toMillis(REFRESH_INTERVAL));
         }
-     //   DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
     }
 
     @Override
@@ -64,41 +78,52 @@ public class MainActivity extends AppCompatActivity {
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, properties);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (db.getQueue() != null)
+            db.getQueue().cancelAll(this);
+        handler.removeCallbacks(dbUpdater);
+    }
 
     public void storeData(JSONObject response) {
-        Log.d(LOG_TAG, "CONNECTED TO DATABASE! :)");
-
+        Log.d(LOG_TAG, "CONNECTED TO DATABASE! :) Updating locally stored data");
+        if (findViewById(R.id.loadBar).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
+            findViewById(R.id.propertySelectHeader).setVisibility(View.VISIBLE);
+        }
         //connect to db and get all the prefixes (pace.miller)
         Iterator<String> keys = response.keys();
         String key, prop, building;
         int currentPeople;
+        prop = "Pace"; //It will be difficult to implement the prefix system below. currently only buildings can be stored in database
         while (keys.hasNext()) {
             key = keys.next();
-      //      prop = key.substring(0, key.indexOf("."));
-      //     building = key.substring(key.indexOf("."));
+            //      prop = key.substring(0, key.indexOf("."));
+            //     building = key.substring(key.indexOf("."));
             currentPeople = -1;
-
-            //DEBUG <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
-            prop = "Pace";
             building = key;
-            try { currentPeople = response.getInt(key);} catch (JSONException e) { e.printStackTrace(); }
+            try {
+                currentPeople = response.getInt(key);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             if (!properties.containsKey(prop))
                 addProperty(prop);
             Property p = properties.get(prop);
             if (p != null)
-                addBuilding(p, building, 1, ((currentPeople != -1) ? currentPeople : 0));
+                addOrUpdateBuilding(p, building, 1, ((currentPeople != -1) ? currentPeople : 0));
         }
-
-
+        //   Log.d(LOG_TAG, "Update complete.");
         DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
-        Log.d(LOG_TAG, "Done connecting. drawing buttons. buildings in pro size is " + properties.values().size());
     }
 
-    private void addBuilding(Property prop, String building, int detectors, int current) {
+    private void addOrUpdateBuilding(Property prop, String building, int detectors, int current) {
         if (!prop.updateBuilding(building, current)) //already exists
             prop.addBuilding(new Building(building, prop, detectors, current));
+        else
+            prop.updateBuilding(building, current);
     }
 
     private void addProperty(String name) {
@@ -107,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchBuildingSelectActivity(View v, String propertyName) {
-     //   String propertyName = "Pace";
+        //   String propertyName = "Pace";
         // and use getContentDescription().toString() as propertyName
         Property property = properties.get(propertyName);
         if (property == null) {
@@ -115,29 +140,33 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error: Cannot find that property", Toast.LENGTH_LONG).show();
             return;
         }
-        Log.d(LOG_TAG, "Property (name: " + propertyName + ") selected. Launching BuildingSelectActivity.");
+        Log.d(LOG_TAG, "Property " + propertyName + " selected. Launching BuildingSelectActivity.");
         Intent intent = new Intent(this, BuildingSelectActivity.class);
         intent.putExtra(EXTRA_PROPERTY, property);
 
         startActivity(intent);
-        //  startActivityForResult(intent, TEXT_REQUEST); //for returning data back to this activity
     }
 
-    public DBManager getDatabase()
-    {
+    public DBManager getDatabase() {
         return db;
     }
 
-    public static MainActivity getInstance()
-    {
+    public static MainActivity getInstance() {
         return ma;
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (db.getQueue() != null) {
-            db.getQueue().cancelAll(this);
+    //returns the (updated) Building for a building in all properties
+    public Building getBuilding(Building b) {
+        Iterator<Property> keys = properties.values().iterator();
+        while (keys.hasNext()) {
+            Property p = keys.next();
+            if (p.contains(b.name))
+                return p.getBuilding(b.name);
         }
+        return null;
+    }
+
+    public Property getProperty(Property p) {
+        return properties.get(p.name);
     }
 }

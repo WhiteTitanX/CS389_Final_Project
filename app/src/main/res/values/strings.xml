@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Tally</string>
+    <string name="app_name">EntryTrack</string>
     <string name="building_info_header">Number of People in %1$s</string>
-    <string name="last_updated_initial_value">Last updated 5 minutes ago</string>
-    <string name="amount_initial_value">%1$d</string>
+    <string name="last_updated_time">Last updated %1$d %2$s ago</string>
+    <string name="last_updated_now">Last updated &lt; 1 minute ago</string>
+    <string name="people_amount">%1$d</string>
     <string name="select_a_property">Select a property</string>
     <string name="select_a_building">Select a building</string>
     <string name="temp_button_text">Pace University (temp)</string>
