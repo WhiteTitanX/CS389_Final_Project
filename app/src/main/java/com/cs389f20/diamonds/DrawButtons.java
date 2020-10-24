@@ -1,18 +1,11 @@
 package com.cs389f20.diamonds;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-
 import java.util.Iterator;
-import java.util.List;
 
 public class DrawButtons {
 

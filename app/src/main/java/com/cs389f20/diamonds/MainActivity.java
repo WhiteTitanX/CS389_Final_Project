@@ -16,14 +16,13 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
     public static final String LOG_TAG = MainActivity.class.getSimpleName(), SERIALIZABLE_KEY = "properties";
     public static final String EXTRA_PROPERTY = "com.cs389f20.diamonds.extra.PROPERTY";
-    public static final int TEXT_REQUEST = 1, REFRESH_INTERVAL = 5;
+    public static final int REFRESH_INTERVAL = 5;
 
     private HashMap<String, Property> properties;
     private DBManager db;
@@ -35,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: When can't connect to internet, make a task to try every 5 seconds, then remove that task. (in onError in DBManager?)
     //TODO: store an array of ints in Building for last 24 hours. each value is either 10 or 5 minutes apart.
+    //TODO: connection for 24hours
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         if (db.getQueue() != null)
             db.getQueue().cancelAll(this);
         handler.removeCallbacks(dbUpdater);
+        db.destroyDBHandler();
     }
 
     public void storeData(JSONObject response) {
@@ -157,9 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
     //returns the (updated) Building for a building in all properties
     public Building getBuilding(Building b) {
-        Iterator<Property> keys = properties.values().iterator();
-        while (keys.hasNext()) {
-            Property p = keys.next();
+        for (Property p : properties.values()) {
             if (p.contains(b.name))
                 return p.getBuilding(b.name);
         }
