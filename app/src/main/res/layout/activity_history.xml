@@ -6,38 +6,61 @@
     android:layout_height="match_parent"
     tools:context=".HistoryActivity">
 
-    <EditText
-        android:id="@+id/editTextSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:autofillHints="search" />
-
-    <Button
-        android:id="@+id/buttonFilter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/button_filter_text"
-        app:layout_constraintBaseline_toBaselineOf="@+id/editTextSearch"
-        app:layout_constraintStart_toEndOf="@+id/editTextSearch" />
-
     <ScrollView
         android:id="@+id/scrollHistory"
         android:layout_width="409dp"
         android:layout_height="649dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSearch">
+        app:layout_constraintTop_toBottomOf="@+id/averageText">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </ScrollView>
+
+    <Spinner
+        android:id="@+id/spinnerFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center|start"
+        android:spinnerMode="dropdown"
+        android:textAlignment="viewStart"
+        app:layout_constraintBottom_toBottomOf="@+id/filterText"
+        app:layout_constraintStart_toEndOf="@+id/filterText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/filterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:autoText="false"
+        android:gravity="center"
+        android:text="Show every"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/averageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:text="Average in last 24 hours: "
+        android:textAlignment="textStart"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filterText" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

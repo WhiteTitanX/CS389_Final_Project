@@ -1,7 +1,5 @@
 package com.cs389f20.diamonds;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -80,14 +80,14 @@ public class BuildingActivity extends AppCompatActivity {
     public void launchHistoryActivity(View v) {
         Log.d(LOG_TAG, "History button pressed. Launching HistoryActivity.");
         Intent intent = new Intent(this, HistoryActivity.class);
-        intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, building.name);
+        intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, building);
         startActivity(intent);
     }
 
     public void launchGraphActivity(View v) {
         Log.d(LOG_TAG, "Graph button pressed. Launching GraphActivity.");
         Intent intent = new Intent(this, GraphActivity.class);
-        intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, building.name);
+        intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, building);
         startActivity(intent);
     }
 
