@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,6 @@ Displays the building info screen
 public class BuildingActivity extends AppCompatActivity {
     private static final String LOG_TAG = BuildingActivity.class.getSimpleName(), SERIALIZABLE_KEY = "building";
     private Building building;
-    private boolean isRunning;
     private Handler handler;
     private Runnable lastUpdateTask;
 
@@ -61,7 +61,7 @@ public class BuildingActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (building != null)
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, building);

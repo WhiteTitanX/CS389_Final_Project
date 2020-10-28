@@ -1,16 +1,18 @@
 package com.cs389f20.diamonds;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Iterator;
 
 public class DrawButtons {
 
 
-    public static void drawButtons(Iterator it, RelativeLayout layout) //List<Property> or List<Builing>
+    public static void drawButtons(Iterator<?> it, RelativeLayout layout) //List<Property> or List<Builing>
     {
         ImageButton btn;
         MainActivity ma = MainActivity.getInstance();
@@ -19,6 +21,11 @@ public class DrawButtons {
         int lastID = -1;
         final int IMAGE_MARGIN_TOP = 60, TEXT_MARGIN_TOP = 25;
         RelativeLayout.LayoutParams paramsButton, paramsText;
+        if (!it.hasNext()) {
+            Log.w(DrawButtons.class.getSimpleName(), "Error: can't draw buttons because there aren't any building or properties.");
+            Toast.makeText(ma.getApplicationContext(), "There aren't any connected properties/buildings.", Toast.LENGTH_LONG).show();
+            return;
+        }
         while (it.hasNext()) {
             final Object obj = it.next();
             Property p = null;
@@ -67,7 +74,7 @@ public class DrawButtons {
                 @Override
                 public void onClick(View v) {
                    if(obj instanceof Property)
-                    MainActivity.getInstance().launchBuildingSelectActivity(v, name);
+                       MainActivity.getInstance().launchBuildingSelectActivity(name);
                    else
                        BuildingSelectActivity.getInstance().launchBuildingActivity(v, name);
                 }

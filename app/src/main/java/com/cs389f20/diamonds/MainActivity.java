@@ -9,13 +9,16 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -34,20 +37,30 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: store an array of ints in Building for last 24 hours. each value is either 10 or 5 minutes apart.
-    //TODO: connection for 24hours
+    //TODO: test 24 hour connection stuff. then test on history activity
+    //TODO: history activity
+    //TODO: images
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         db = new DBManager(this);
 
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
+
         if (savedInstanceState != null) {
-            properties = (HashMap) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
+            try {
+                properties = (HashMap<String, Property>) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Error: Can't get properties map from cache!");
+                finish();
+            }
+
             findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
             //need to update property selection buttons (not a priority as only one property right now)
         } else {
@@ -71,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (properties != null)
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, properties);
@@ -86,44 +99,70 @@ public class MainActivity extends AppCompatActivity {
         db.destroyDBHandler();
     }
 
-    public void storeData(JSONObject response) {
+    public void storeData(JSONObject stringResponse, JSONArray arrayResponse) {
         Log.d(LOG_TAG, "CONNECTED TO DATABASE! :) Updating locally stored data");
-        if (findViewById(R.id.loadBar).getVisibility() == View.VISIBLE) {
-            findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
-            findViewById(R.id.propertySelectHeader).setVisibility(View.VISIBLE);
+        Iterator<String> keys;
+        //Get a list of all buildings
+        if ((stringResponse != null))
+            keys = stringResponse.keys();
+        else {
+            try {
+                keys = arrayResponse.getJSONObject(0).getJSONObject("data").keys();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return;
+            }
         }
-        //connect to db and get all the prefixes (pace.miller)
-        Iterator<String> keys = response.keys();
-        String key, prop, building;
+
+        String prop, building;
         int currentPeople;
+        int[] pastPeople;
+        String[] times = null;
         prop = "Pace"; //It will be difficult to implement the prefix system below. currently only buildings can be stored in database
         while (keys.hasNext()) {
-            key = keys.next();
-            //      prop = key.substring(0, key.indexOf("."));
-            //     building = key.substring(key.indexOf("."));
+            building = keys.next();
             currentPeople = -1;
-            building = key;
+            pastPeople = null;
             try {
-                currentPeople = response.getInt(key);
+                if (stringResponse != null)
+                    currentPeople = stringResponse.getInt(building);
+                else {
+                    if (times == null)
+                        times = new String[arrayResponse.length()];
+                    pastPeople = new int[arrayResponse.length()];
+                    for (int i = 0; i < arrayResponse.length(); i++) {
+                        pastPeople[i] = arrayResponse.getJSONObject(i).getJSONObject("data").getInt(building);
+                        if (times[i] == null)
+                            times[i] = arrayResponse.getJSONObject(i).getString("timestamp");
+                    }
+
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
             if (!properties.containsKey(prop))
                 addProperty(prop);
             Property p = properties.get(prop);
             if (p != null)
-                addOrUpdateBuilding(p, building, 1, ((currentPeople != -1) ? currentPeople : 0));
+                addOrUpdateBuilding(p, building, currentPeople, pastPeople, times);
         }
-        //   Log.d(LOG_TAG, "Update complete.");
-        DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
+
+        if (findViewById(R.id.loadBar).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
+            findViewById(R.id.propertySelectHeader).setVisibility(View.VISIBLE);
+        }
+        if (!properties.values().iterator().hasNext())
+            findViewById(R.id.textNoProperties).setVisibility(View.VISIBLE);
+        else {
+            if (findViewById(R.id.textNoProperties).getVisibility() == View.VISIBLE)
+                findViewById(R.id.textNoProperties).setVisibility(View.INVISIBLE);
+            DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
+        }
     }
 
-    private void addOrUpdateBuilding(Property prop, String building, int detectors, int current) {
-        if (!prop.updateBuilding(building, current)) //already exists
-            prop.addBuilding(new Building(building, prop, detectors, current));
-        else
-            prop.updateBuilding(building, current);
+    private void addOrUpdateBuilding(Property prop, String building, int current, int[] past, String[] times) {
+        if (!prop.updateBuilding(building, current, past, times)) //already exists
+            prop.addBuilding(new Building(building, prop, 1, current, past, times));
     }
 
     private void addProperty(String name) {
@@ -131,9 +170,7 @@ public class MainActivity extends AppCompatActivity {
         properties.put(name, prop);
     }
 
-    public void launchBuildingSelectActivity(View v, String propertyName) {
-        //   String propertyName = "Pace";
-        // and use getContentDescription().toString() as propertyName
+    public void launchBuildingSelectActivity(String propertyName) {
         Property property = properties.get(propertyName);
         if (property == null) {
             Log.e(LOG_TAG, "Trying to launch BuildingSelectActivity when propertyName of " + propertyName + " isn't part of properties map.");

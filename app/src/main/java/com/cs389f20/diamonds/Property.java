@@ -28,23 +28,18 @@ public class Property implements java.io.Serializable {
         buildings.add(b);
     }
 
-    public boolean updateBuilding(String name, int newCount)
-    {
-      try {
-          getBuilding(name).setPeople(newCount);
-          return true;
-      }
-      catch (NullPointerException e){
-          return  false;
-      }
-    }
-
-    public void removeBuilding(Building b) {
-        buildings.remove(b);
-    }
-
-    public boolean contains(Building b) {
-        return buildings.contains(b);
+    public boolean updateBuilding(String name, int newCount, int[] past, String[] times) {
+        try {
+            if (newCount != -1)
+                getBuilding(name).setPeople(newCount);
+            else if (past != null && times != null)
+                getBuilding(name).setPastPeople(past, times);
+            else
+                return false;
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     public boolean contains(String name) {
