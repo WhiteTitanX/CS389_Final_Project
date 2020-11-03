@@ -37,10 +37,6 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: test 24 hour connection stuff. then test on history activity
-    //TODO: history activity
-    //TODO: images
-
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         db = new DBManager(this);
 
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
-
         if (savedInstanceState != null) {
             try {
                 properties = (HashMap<String, Property>) savedInstanceState.getSerializable(SERIALIZABLE_KEY);
@@ -100,16 +95,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void storeData(JSONObject stringResponse, JSONArray arrayResponse) {
-        Log.d(LOG_TAG, "CONNECTED TO DATABASE! :) Updating locally stored data");
-        Iterator<String> keys;
+        Log.d(LOG_TAG, "CONNECTED TO DATABASE! :) Updating locally stored data for " + ((stringResponse != null) ? "current count" : "past count"));
+        Iterator<String> keys = null;
         //Get a list of all buildings
-        if ((stringResponse != null))
+        if (stringResponse != null)
             keys = stringResponse.keys();
         else {
             try {
-                keys = arrayResponse.getJSONObject(0).getJSONObject("data").keys();
+                for (int i = 0; i < arrayResponse.length(); i++)
+                    if (arrayResponse.getJSONObject(i).getJSONObject("data").length() != 0) {
+                        keys = arrayResponse.getJSONObject(1).getJSONObject("data").keys();
+                        break;
+                    }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, "Keys fetch: " + Objects.requireNonNull(e.getMessage()));
                 return;
             }
         }
@@ -118,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
         int currentPeople;
         int[] pastPeople;
         String[] times = null;
-        prop = "Pace"; //It will be difficult to implement the prefix system below. currently only buildings can be stored in database
+        prop = "Pace"; //It will be difficult to implement the prefix system. currently only buildings can be stored in database
+        assert keys != null;
         while (keys.hasNext()) {
             building = keys.next();
             currentPeople = -1;
@@ -131,6 +131,10 @@ public class MainActivity extends AppCompatActivity {
                         times = new String[arrayResponse.length()];
                     pastPeople = new int[arrayResponse.length()];
                     for (int i = 0; i < arrayResponse.length(); i++) {
+                        if (arrayResponse.getJSONObject(i).getJSONObject("data").length() == 0) {
+                            pastPeople[i] = -1;
+                            continue;
+                        }
                         pastPeople[i] = arrayResponse.getJSONObject(i).getJSONObject("data").getInt(building);
                         if (times[i] == null)
                             times[i] = arrayResponse.getJSONObject(i).getString("timestamp");
@@ -138,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, "Value fetch: " + Objects.requireNonNull(e.getMessage()));
+                Toast.makeText(getApplicationContext(), "Note: an error occurred trying to get data from database", Toast.LENGTH_LONG).show();
             }
             if (!properties.containsKey(prop))
                 addProperty(prop);
@@ -158,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.textNoProperties).setVisibility(View.INVISIBLE);
             DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
         }
+
     }
 
     private void addOrUpdateBuilding(Property prop, String building, int current, int[] past, String[] times) {

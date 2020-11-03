@@ -45,7 +45,7 @@ public class DBManager {
 
         if (type.equals("current")) {
             // Request a string response from the provided URL.
-            JsonObjectRequest jsonObjectRequestRequest = new JsonObjectRequest
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                         @Override
@@ -53,30 +53,7 @@ public class DBManager {
                             lastUpdated = System.currentTimeMillis();
                             ma.storeData(response, null);
                         }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "ERROR: Couldn't connect to database ");
-                            int REFRESH_INTERVAL = 10;
-                            //Can't connect to internet
-                            if (Objects.requireNonNull(error.getCause()).toString().contains("UnknownHostException")) {
-                                Toast.makeText(ma.getApplicationContext(), "Can't connect to the internet.", Toast.LENGTH_LONG).show();
-                                Log.w(LOG_TAG, "Can't connect to internet. Retrying every " + REFRESH_INTERVAL + " seconds");
-
-                            } else {
-                                Toast.makeText(ma.getApplicationContext(), "Can't connect to database. Try restarting the app.", Toast.LENGTH_LONG).show();
-                                error.printStackTrace();
-                                REFRESH_INTERVAL = 15;
-                            }
-                            dbConnectionRefresh = new Runnable() {
-                                @Override
-                                public void run() {
-                                    ma.getDatabase().connectToDatabase("current");
-                                }
-                            };
-                            handler.postDelayed(dbConnectionRefresh, TimeUnit.SECONDS.toMillis(REFRESH_INTERVAL));
-                        }
-                    }) {
+                    }, errorResponse(type)) {
                 @Override
                 public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<>();
@@ -85,9 +62,9 @@ public class DBManager {
                     return params;
                 }
             };
-            queue.add(jsonObjectRequestRequest);
+            queue.add(jsonObjectRequest);
         } else {
-            JsonArrayRequest jsonArrayRequestRequest = new JsonArrayRequest
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
 
                         @Override
@@ -95,30 +72,7 @@ public class DBManager {
                             lastUpdated = System.currentTimeMillis();
                             ma.storeData(null, response);
                         }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(LOG_TAG, "ERROR: Couldn't connect to database ");
-                            int REFRESH_INTERVAL = 10;
-                            //Can't connect to internet
-                            if (Objects.requireNonNull(error.getCause()).toString().contains("UnknownHostException")) {
-                                Toast.makeText(ma.getApplicationContext(), "Can't connect to the internet.", Toast.LENGTH_LONG).show();
-                                Log.w(LOG_TAG, "Can't connect to internet. Retrying every " + REFRESH_INTERVAL + " seconds");
-
-                            } else {
-                                Toast.makeText(ma.getApplicationContext(), "Can't connect to database. Try restarting the app.", Toast.LENGTH_LONG).show();
-                                error.printStackTrace();
-                                REFRESH_INTERVAL = 15;
-                            }
-                            dbConnectionRefresh = new Runnable() {
-                                @Override
-                                public void run() {
-                                    ma.getDatabase().connectToDatabase("current");
-                                }
-                            };
-                            handler.postDelayed(dbConnectionRefresh, TimeUnit.SECONDS.toMillis(REFRESH_INTERVAL));
-                        }
-                    }) {
+                    }, errorResponse(type)) {
                 @Override
                 public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<>();
@@ -127,22 +81,49 @@ public class DBManager {
                     return params;
                 }
             };
-            queue.add(jsonArrayRequestRequest);
+            queue.add(jsonArrayRequest);
         }
     }
 
-    public void destroyDBHandler()
-    {
+    public void destroyDBHandler() {
         handler.removeCallbacks(dbConnectionRefresh);
     }
 
-    public RequestQueue getQueue()
-    {
+    public RequestQueue getQueue() {
         return queue;
     }
 
-    public long getLastUpdated()
-    {
+    public long getLastUpdated() {
         return System.currentTimeMillis() - lastUpdated;
+    }
+
+    private Response.ErrorListener errorResponse(final String type) {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(LOG_TAG, "ERROR: Couldn't connect to database ");
+                int REFRESH_INTERVAL = 10;
+                //Can't connect to internet
+                if (Objects.requireNonNull(error.getCause()).toString().contains("UnknownHostException")) {
+                    Toast.makeText(ma.getApplicationContext(), "Can't connect to the internet.", Toast.LENGTH_LONG).show();
+                    Log.w(LOG_TAG, "Can't connect to internet. Retrying every " + REFRESH_INTERVAL + " seconds");
+
+                } else {
+                    Toast.makeText(ma.getApplicationContext(), "Can't connect to database. Try restarting the app.", Toast.LENGTH_LONG).show();
+                    error.printStackTrace();
+                    REFRESH_INTERVAL = 15;
+                }
+                dbConnectionRefresh = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!type.equals("current") && !type.equals("past"))
+                            ma.getDatabase().connectToDatabase();
+                        else
+                            ma.getDatabase().connectToDatabase(type);
+                    }
+                };
+                handler.postDelayed(dbConnectionRefresh, TimeUnit.SECONDS.toMillis(REFRESH_INTERVAL));
+            }
+        };
     }
 }

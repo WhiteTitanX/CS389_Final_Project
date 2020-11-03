@@ -2,6 +2,7 @@ package com.cs389f20.diamonds;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +35,7 @@ public class HistoryActivity extends AppCompatActivity {
         scrollView = findViewById(R.id.scrollHistory);
 
         Spinner dropdown = findViewById(R.id.spinnerFilter);
-        String[] items = new String[]{"5 minutes", "15 minutes", "30 minutes", "hour"}; //TODO: i think the db is storing every 15 minutes
+        final String[] items = new String[]{"15 minutes", "30 minutes", "hour"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
         dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -43,13 +44,13 @@ public class HistoryActivity extends AppCompatActivity {
                                        int position, long id) {
                 Object item = adapterView.getItemAtPosition(position);
                 if (item != null) {
-                    Toast.makeText(MainActivity.getInstance().getApplicationContext(), item.toString(),
-                            Toast.LENGTH_SHORT).show();
-
-                    displayLog();
+                    if (item.toString().equals(items[1]))
+                        displayLog(30);
+                    else if (item.toString().equals(items[2]))
+                        displayLog(60);
+                    else
+                        displayLog(15);
                 }
-                Toast.makeText(MainActivity.getInstance().getApplicationContext(), "Selected",
-                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -58,9 +59,16 @@ public class HistoryActivity extends AppCompatActivity {
         });
     }
 
-    private void displayLog() {
+    private void displayLog(int minutes) {
         //add items from building's array to the scroll view
-        int[] count = building.pastNumberOfPeople;
+        PastCount[] data = building.getPastArray(minutes);
+        if (data == null) //TODO: maybe turn this into TextView on the history activity, instead of just a toast?
+        {
+            Log.e(HistoryActivity.class.getSimpleName(), "There is no past data for " + building.name);
+            Toast.makeText(getApplicationContext(), "Error: No past data for " + building.name, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         RelativeLayout.LayoutParams paramsText = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -70,14 +78,15 @@ public class HistoryActivity extends AppCompatActivity {
 
         TextView textView;
         int lastID = R.id.averageText;
-        for (int i = 0; i < count.length; i++) //TODO: from user selection, get length for interval (move x spaces for 5 minutes, 10 for 10 etc.)
-        {
-            textView = new TextView(this);
-            textView.setText(building.timestamps[i]);
+
+        for (PastCount datum : data) {
+         /*   textView = new TextView(this);
+            textView.setText(building.pastNumberOfPeople[i]);
             paramsText.addRule(RelativeLayout.BELOW, lastID);
-            lastID = textView.getId();
-            scrollView.addView(textView, paramsText);
+            lastID = textView.getId(); */
+            Log.d(HistoryActivity.class.getName(), datum.getDate() + ": " + datum.getPeople());
         }
+        Log.d(HistoryActivity.class.getSimpleName(), "Data length is : " + data.length); //15m should be 96, 30m should be 48, 1h should be 24
     }
 
     @Override
