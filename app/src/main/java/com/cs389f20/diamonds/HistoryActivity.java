@@ -86,7 +86,6 @@ public class HistoryActivity extends AppCompatActivity {
             lastID = textView.getId(); */
             Log.d(HistoryActivity.class.getName(), datum.getDate() + ": " + datum.getPeople());
         }
-        Log.d(HistoryActivity.class.getSimpleName(), "Data length is : " + data.length); //15m should be 96, 30m should be 48, 1h should be 24
     }
 
     @Override

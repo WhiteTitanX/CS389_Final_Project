@@ -131,13 +131,11 @@ public class MainActivity extends AppCompatActivity {
                         times = new String[arrayResponse.length()];
                     pastPeople = new int[arrayResponse.length()];
                     for (int i = 0; i < arrayResponse.length(); i++) {
-                        if (arrayResponse.getJSONObject(i).getJSONObject("data").length() == 0) {
+                        times[i] = arrayResponse.getJSONObject(i).getString("timestamp");
+                        if (arrayResponse.getJSONObject(i).getJSONObject("data").length() == 0 || !arrayResponse.getJSONObject(i).getJSONObject("data").has(building))
                             pastPeople[i] = -1;
-                            continue;
-                        }
-                        pastPeople[i] = arrayResponse.getJSONObject(i).getJSONObject("data").getInt(building);
-                        if (times[i] == null)
-                            times[i] = arrayResponse.getJSONObject(i).getString("timestamp");
+                        else
+                            pastPeople[i] = arrayResponse.getJSONObject(i).getJSONObject("data").getInt(building);
                     }
 
                 }
