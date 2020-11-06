@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Building implements java.io.Serializable {
     public String name;
@@ -97,7 +98,9 @@ public class Building implements java.io.Serializable {
         result = month + " " + day + " " + year + " " + num;
         Date date;
         try {
-            date = new SimpleDateFormat("MMM dd yyyy HH:mm:ss", Locale.ENGLISH).parse(result);
+            SimpleDateFormat format = new SimpleDateFormat("MMM dd yyyy HH:mm:ss", Locale.ENGLISH);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            date = format.parse(result);
         } catch (ParseException e) {
             Log.e(Building.class.getSimpleName(), "Parse ERROR! " + e.getMessage());
             return null;

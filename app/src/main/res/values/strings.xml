@@ -22,4 +22,5 @@
     <string name="force_refresh_text">Force Refresh</string>
     <string name="amount_zero">0</string>
     <string name="no_properties">No properties are available :(</string>
+    <string name="history_average">Average in last 24 hours: %1$d</string>
 </resources>
