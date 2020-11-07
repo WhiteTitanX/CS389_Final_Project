@@ -69,9 +69,9 @@ public class HistoryActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.logText);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        String text = "";
+        String text = "", dateString = "";
         for (PastCount datum : data) {
-            text += datum.getDate() + " " + datum.getPeople() + "\n";
+            text += datum.getStringDate() + " => " + datum.getPeople() + "\n";
         }
         textView.setText(text);
     }

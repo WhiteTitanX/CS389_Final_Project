@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
+    //TODO: fix landscape mode on BuildingActivity (or lock to portrait)
+    //TODO: add scrollable for BuildingSelectActivity activity?
+
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {

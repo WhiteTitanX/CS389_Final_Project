@@ -11,7 +11,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".GraphActivity"
-            android:parentActivityName=".BuildingActivity">
+            android:parentActivityName=".BuildingActivity"
+            android:screenOrientation="landscape">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cs389f20.diamonds.BuildingActivity" />
@@ -39,7 +40,8 @@
         </activity>
         <activity
             android:name=".BuildingActivity"
-            android:parentActivityName=".BuildingSelectActivity">
+            android:parentActivityName=".BuildingSelectActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cs389f20.diamonds.BuildingSelectActivity" />
