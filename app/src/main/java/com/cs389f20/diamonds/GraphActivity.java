@@ -5,14 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
-
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -39,56 +39,64 @@ public class GraphActivity extends AppCompatActivity {
             return;
         }
 
-
         GraphView graph = findViewById(R.id.graph);
         // set date label formatter for x axis format (hh:mm am/pm)
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter()
         {
             @Override
             public java.lang.String formatLabel(double value, boolean isValueX) {
-                if(isValueX)
-                {
-                    return adf.format(new Date((long)value));
-                }
-                else{
-                    return super.formatLabel(value, isValueX);
-                }
-
+                if(isValueX) { return adf.format(new Date((long)value)); }
+                else{ return super.formatLabel(value, isValueX);}
             }
         });
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);//fix the number of default x axis labels 
+        //create datapoints for line
         DataPoint[] points = new DataPoint[24];
-        double y_max = 100;//placeholder
+        double y_max = 0;
         for(int i = 0; i < points.length; i++){
             points[i] = new DataPoint(data[i].getDate(),data[i].getPeople());
             if(data[i].getPeople() > y_max){
                 y_max = data[i].getPeople();
             }
         }
+
+        //create line with datapoints above
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
-
-
-        // set manual x bounds
+        //Setup graph options
+        // set manual x bounds on graph
         graph.getViewport().setMinX(data[0].getDate().getTime());
         graph.getViewport().setMaxX(data[23].getDate().getTime());
         graph.getViewport().setXAxisBoundsManual(true);
-        //set manual y bounds
+        //set manual y bounds on graph
         graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(y_max + 10);
+        graph.getViewport().setMaxY(y_max);
         graph.getViewport().setYAxisBoundsManual(true);
-        //prevent GraphView from rounding x and y values
-        graph.getGridLabelRenderer().setHumanRounding(false);
-        //enable pinch and zoom for graph NOTE: Please try on actual phone
+        //prevent GraphView from rounding x but allow rounding of y values
+        graph.getGridLabelRenderer().setHumanRounding(false,true );
+        //fix the number of default x axis labels
+        graph.getGridLabelRenderer().setNumHorizontalLabels(24);
+        //If labels are 45 degrees they fit
+        graph.getGridLabelRenderer().setHorizontalLabelsAngle(45);
+        graph.getGridLabelRenderer().setPadding(175);
+        //Allow zooming and scrolling on graph
         graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(true);
+        //graph.getViewport().setScalableY(true); I am still messing around with this
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScrollableY(true);
 
-        //TODO "tap listener on data" so that each point can be clicked on to show data
+        //Datapoints can be taped to show Capacity at each time ie "105 people at 08:03 AM"
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Toast.makeText(GraphActivity.this, Math.round(dataPoint.getY()) + " people at " +  adf.format(dataPoint.getX()), Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        //TODO "Style options"
-        graph.addSeries(series);
-
-
-
+        //Style options for graph and line series
+        graph.setTitle("Past 24 hours");
+        series.setDrawDataPoints(true);//Show data points on line series
+        series.setDrawBackground(true);//shade in under line series
+        graph.addSeries(series);//draw line on graph
+        
     }
 
     @Override
