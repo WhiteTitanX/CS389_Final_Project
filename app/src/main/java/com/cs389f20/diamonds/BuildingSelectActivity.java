@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -57,7 +58,7 @@ public class BuildingSelectActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (property != null)
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, property);
@@ -79,9 +80,6 @@ public class BuildingSelectActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error: Can't open building info (MainActivity) without clicking a button", Toast.LENGTH_LONG).show();
             return;
         }
-        ImageButton button;
-        button = (ImageButton) v;
-
         Building building = property.getBuilding(buildingName);
         if (building == null) {
             Log.e(LOG_TAG, "Trying to launch MainActivity when buildingName of " + buildingName + " isn't part of buildings list in property " + property.name);
