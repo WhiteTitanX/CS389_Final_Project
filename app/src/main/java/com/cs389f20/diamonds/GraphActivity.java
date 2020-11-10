@@ -23,14 +23,18 @@ public class GraphActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
-        // used for timestamp formatting
-        final SimpleDateFormat adf = new SimpleDateFormat("hh:mm a");
         Intent intent = getIntent();
         building = (Building) intent.getSerializableExtra(BuildingSelectActivity.EXTRA_BUILDING);
         assert building != null;
         setTitle(getString((R.string.graph_title), building.name));
+        //displays for 15 minute intervals change to 60 for hour,30 for ever half hour
+        displaygraph(15);
+    }
 
-        PastCount[] data = building.getPastArray(60);
+    private void displaygraph(int minutes) {
+        final SimpleDateFormat adf = new SimpleDateFormat("hh:mm a");
+        PastCount[] data = building.getPastArray(minutes);
+
         if (data == null) //TODO Make error screen?
         {
             Log.e(HistoryActivity.class.getSimpleName(), "There is no past data for " + building.name);
@@ -38,7 +42,7 @@ public class GraphActivity extends AppCompatActivity {
             finish();
             return;
         }
-
+        System.out.println(data.length);
         GraphView graph = findViewById(R.id.graph);
         // set date label formatter for x axis format (hh:mm am/pm)
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter()
@@ -50,7 +54,7 @@ public class GraphActivity extends AppCompatActivity {
             }
         });
         //create datapoints for line
-        DataPoint[] points = new DataPoint[24];
+        DataPoint[] points = new DataPoint[data.length];
         double y_max = 0;
         for(int i = 0; i < points.length; i++){
             points[i] = new DataPoint(data[i].getDate(),data[i].getPeople());
@@ -62,6 +66,7 @@ public class GraphActivity extends AppCompatActivity {
         //create line with datapoints above
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
         //Setup graph options
+        graph.setTitle("Past 24 hours");
         // set manual x bounds on graph
         graph.getViewport().setMinX(data[0].getDate().getTime());
         graph.getViewport().setMaxX(data[23].getDate().getTime());
@@ -92,11 +97,9 @@ public class GraphActivity extends AppCompatActivity {
         });
 
         //Style options for graph and line series
-        graph.setTitle("Past 24 hours");
         series.setDrawDataPoints(true);//Show data points on line series
         series.setDrawBackground(true);//shade in under line series
         graph.addSeries(series);//draw line on graph
-        
     }
 
     @Override
