@@ -46,7 +46,7 @@
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAmount" />
+        app:layout_constraintTop_toBottomOf="@+id/textCapacity" />
 
     <TextView
         android:id="@+id/textNotify"
@@ -83,17 +83,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonHistory" />
 
-    <EditText
-        android:id="@+id/editTextNotify"
-        android:layout_width="50dp"
+    <Spinner
+        android:id="@+id/spinnerNotify"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:autofillHints="0"
-        android:ems="10"
-        android:hint="@string/amount_zero"
-        android:inputType="number"
-        android:textAlignment="center"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textNotify"
-        app:layout_constraintStart_toEndOf="@+id/textNotify" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="80dp"
+        app:layout_constraintStart_toEndOf="@+id/textNotify"
+        app:layout_constraintTop_toBottomOf="@+id/textlastUpdated" />
+
+    <TextView
+        android:id="@+id/textCapacity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/capacity_text"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textAmount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

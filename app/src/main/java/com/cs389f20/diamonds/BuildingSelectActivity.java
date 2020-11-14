@@ -6,7 +6,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -54,7 +55,18 @@ public class BuildingSelectActivity extends AppCompatActivity {
         }
         setTitle(property.name);
 
-        updateButtons();
+        if (!property.getBuildings().iterator().hasNext()) {
+            findViewById(R.id.textNoBuildings).setVisibility(View.VISIBLE);
+            TextView textView = findViewById(R.id.textNoBuildings);
+            textView.setText(getString(R.string.no_buildings, property.name));
+            findViewById(R.id.buildingScrollLayout).setVisibility(View.INVISIBLE);
+        } else {
+            if (findViewById(R.id.textNoBuildings).getVisibility() == View.VISIBLE) {
+                findViewById(R.id.textNoBuildings).setVisibility(View.INVISIBLE);
+                findViewById(R.id.buildingScrollLayout).setVisibility(View.VISIBLE);
+            }
+            updateButtons();
+        }
     }
 
     @Override
@@ -98,6 +110,6 @@ public class BuildingSelectActivity extends AppCompatActivity {
     }
 
     public void updateButtons() {
-        DrawButtons.drawButtons(property.getBuildings().iterator(), (RelativeLayout) findViewById(R.id.buildingSelectLayout));
+        DrawButtons.drawButtons(property.getBuildings().iterator(), (LinearLayout) findViewById(R.id.buildingScrollLayout));
     }
 }

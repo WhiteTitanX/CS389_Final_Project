@@ -86,7 +86,8 @@ public class DBManager {
     }
 
     public void destroyDBHandler() {
-        handler.removeCallbacks(dbConnectionRefresh);
+        if (dbConnectionRefresh != null)
+            handler.removeCallbacks(dbConnectionRefresh);
     }
 
     public RequestQueue getQueue() {

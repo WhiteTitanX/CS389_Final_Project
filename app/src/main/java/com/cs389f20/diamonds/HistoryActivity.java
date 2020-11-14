@@ -69,11 +69,12 @@ public class HistoryActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.logText);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        String text = "", dateString = "";
+        textView.scrollTo(0, 0);
+        StringBuilder text = new StringBuilder();
         for (PastCount datum : data) {
-            text += datum.getStringDate() + " => " + datum.getPeople() + "\n";
+            text.append(datum.getStringDate()).append(" : ").append(datum.getPeople()).append("  \n");
         }
-        textView.setText(text);
+        textView.setText(text.toString());
     }
 
     private void displayAverage() {

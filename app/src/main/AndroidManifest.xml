@@ -19,19 +19,23 @@
         </activity>
         <activity
             android:name=".HistoryActivity"
-            android:parentActivityName=".BuildingActivity">
+            android:parentActivityName=".BuildingActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cs389f20.diamonds.BuildingActivity" />
         </activity>
         <activity
             android:name=".BuildingSelectActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cs389f20.diamonds.MainActivity" />
         </activity>
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

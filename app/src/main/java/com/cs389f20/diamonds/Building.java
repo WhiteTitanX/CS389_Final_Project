@@ -13,14 +13,15 @@ import java.util.TimeZone;
 public class Building implements java.io.Serializable {
     public String name;
     public Property property;
-    public int numOfDetectors, currentNumberOfPeople;
+    public int numOfDetectors, currentNumberOfPeople, maxOccupancy;
     private PastCount[] pastNumberOfPeople;
 
-    public Building(String buildingName, Property _p, int detectors, int currentNum, int[] past, String[] timestamps) {
+    public Building(String buildingName, Property _p, int detectors, int currentNum, int maximum, int[] past, String[] timestamps) {
         name = buildingName;
         property = _p;
         numOfDetectors = detectors;
         currentNumberOfPeople = currentNum;
+        maxOccupancy = maximum;
         if (past != null && timestamps != null)
             setPastPeople(past, timestamps);
     }
@@ -60,7 +61,7 @@ public class Building implements java.io.Serializable {
     private PastCount[] getPastPeople(int interval) {
         if (pastNumberOfPeople == null)
             return null;
-        int n = (pastNumberOfPeople.length) / interval, index;
+        int n = (int) Math.ceil((float) pastNumberOfPeople.length / interval), index;
         List<PastCount> result = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             index = interval * i;

@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
 
 public class MainActivity extends AppCompatActivity {
     public static final String LOG_TAG = MainActivity.class.getSimpleName(), SERIALIZABLE_KEY = "properties";
@@ -37,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: fix landscape mode on BuildingActivity (or lock to portrait)
-    //TODO: add scrollable for BuildingSelectActivity activity?
+    //TODO: app icon
 
     @Override
     @SuppressWarnings("unchecked")
@@ -93,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (db.getQueue() != null)
             db.getQueue().cancelAll(this);
-        handler.removeCallbacks(dbUpdater);
+        if (dbUpdater != null)
+            handler.removeCallbacks(dbUpdater);
         db.destroyDBHandler();
     }
 
@@ -117,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         String prop, building;
-        int currentPeople;
+        int currentPeople, maxPeople;
         int[] pastPeople;
         String[] times = null;
         prop = "Pace"; //It will be difficult to implement the prefix system. currently only buildings can be stored in database
@@ -125,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         while (keys.hasNext()) {
             building = keys.next();
             currentPeople = -1;
+            maxPeople = 246;
             pastPeople = null;
             try {
                 if (stringResponse != null)
@@ -150,26 +150,31 @@ public class MainActivity extends AppCompatActivity {
                 addProperty(prop);
             Property p = properties.get(prop);
             if (p != null)
-                addOrUpdateBuilding(p, building, currentPeople, pastPeople, times);
+                addOrUpdateBuilding(p, building, currentPeople, maxPeople, pastPeople, times);
         }
 
         if (findViewById(R.id.loadBar).getVisibility() == View.VISIBLE) {
             findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
             findViewById(R.id.propertySelectHeader).setVisibility(View.VISIBLE);
         }
-        if (!properties.values().iterator().hasNext())
+        if (!properties.values().iterator().hasNext()) {
             findViewById(R.id.textNoProperties).setVisibility(View.VISIBLE);
-        else {
-            if (findViewById(R.id.textNoProperties).getVisibility() == View.VISIBLE)
+            findViewById(R.id.propertyScrollLayout).setVisibility(View.INVISIBLE);
+        } else {
+            if (findViewById(R.id.textNoProperties).getVisibility() == View.VISIBLE) {
                 findViewById(R.id.textNoProperties).setVisibility(View.INVISIBLE);
-            DrawButtons.drawButtons(properties.values().iterator(), (RelativeLayout) findViewById(R.id.propertySelectLayout));
+                findViewById(R.id.propertyScrollLayout).setVisibility(View.VISIBLE);
+            }
+            if (arrayResponse == null)
+                DrawButtons.drawButtons(properties.values().iterator(), (LinearLayout) findViewById(R.id.propertyScrollLayout));
+            //(RelativeLayout) findViewById(R.id.propertySelectLayout)
         }
 
     }
 
-    private void addOrUpdateBuilding(Property prop, String building, int current, int[] past, String[] times) {
+    private void addOrUpdateBuilding(Property prop, String building, int current, int max, int[] past, String[] times) {
         if (!prop.updateBuilding(building, current, past, times)) //already exists
-            prop.addBuilding(new Building(building, prop, 1, current, past, times));
+            prop.addBuilding(new Building(building, prop, 1, current, max, past, times));
     }
 
     private void addProperty(String name) {
