@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //TODO: app icon
+    //TODO: get max capacity from db
 
     @Override
     @SuppressWarnings("unchecked")
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         while (keys.hasNext()) {
             building = keys.next();
             currentPeople = -1;
-            maxPeople = 246;
+            maxPeople = 250;
             pastPeople = null;
             try {
                 if (stringResponse != null)
