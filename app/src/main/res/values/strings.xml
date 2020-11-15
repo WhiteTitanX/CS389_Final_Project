@@ -9,7 +9,7 @@
     <string name="temp_button_text">Pace University (temp)</string>
     <string name="button_show_history">Show History</string>
     <string name="button_display_graph">Display Graph</string>
-    <string name="text_notify">Notify me when capacity reaches</string>
+    <string name="text_notify">Notify me when occupancy reaches</string>
     <string name="history_searchText_initial">search</string>
     <string name="button_filter_text">Filter</string>
     <string name="history_title">%1$s History</string>
@@ -25,5 +25,5 @@
     <string name="no_buildings">%1$s does not have any buildings :(</string>
     <string name="history_average">Average in last 24 hours: \n %1$d</string>
     <string name="history_interval_text">Show every</string>
-    <string name="capacity_text">Capacity is %1$s</string>
+    <string name="capacity_text">Occupancy is %1$s</string>
 </resources>
