@@ -11,17 +11,20 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class Building implements java.io.Serializable {
-    public String name;
+    public String name, notificationType = "";
     public Property property;
-    public int numOfDetectors, currentNumberOfPeople, maxOccupancy;
+    public int numOfDetectors, currentNumberOfPeople, maxOccupancy, notificationID;
+    public boolean isNotificationActive = false;
     private PastCount[] pastNumberOfPeople;
 
-    public Building(String buildingName, Property _p, int detectors, int currentNum, int maximum, int[] past, String[] timestamps) {
+
+    public Building(String buildingName, Property _p, int detectors, int currentNum, int maximum, int notID, int[] past, String[] timestamps) {
         name = buildingName;
         property = _p;
         numOfDetectors = detectors;
         currentNumberOfPeople = currentNum;
         maxOccupancy = maximum;
+        notificationID = notID;
         if (past != null && timestamps != null)
             setPastPeople(past, timestamps);
     }

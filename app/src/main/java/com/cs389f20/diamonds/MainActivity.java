@@ -1,6 +1,9 @@
 package com.cs389f20.diamonds;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,8 +25,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String LOG_TAG = MainActivity.class.getSimpleName(), SERIALIZABLE_KEY = "properties";
-    public static final String EXTRA_PROPERTY = "com.cs389f20.diamonds.extra.PROPERTY";
+    public static final String LOG_TAG = MainActivity.class.getSimpleName(), SERIALIZABLE_KEY = "properties",
+            EXTRA_PROPERTY = "com.cs389f20.diamonds.extra.PROPERTY", NOTIFICATION_CHANNEL = "ENTRY_TRACK_CHANNEL";
     public static final int REFRESH_INTERVAL = 5;
 
     private HashMap<String, Property> properties;
@@ -77,6 +80,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             handler.postDelayed(dbUpdater, TimeUnit.MINUTES.toMillis(REFRESH_INTERVAL));
+            createNotificationChannel();
+        }
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "CHANNEL_ENTRYTRACK";
+            String description = "Notifications for EntryTrack";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 
@@ -117,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         String prop, building;
-        int currentPeople, maxPeople;
+        int currentPeople, maxPeople, notificationIndex = 0;
         int[] pastPeople;
         String[] times = null;
         prop = "Pace"; //It will be difficult to implement the prefix system. currently only buildings can be stored in database
@@ -151,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 addProperty(prop);
             Property p = properties.get(prop);
             if (p != null)
-                addOrUpdateBuilding(p, building, currentPeople, maxPeople, pastPeople, times);
+                addOrUpdateBuilding(p, building, currentPeople, maxPeople, notificationIndex++, pastPeople, times);
         }
 
         if (findViewById(R.id.loadBar).getVisibility() == View.VISIBLE) {
@@ -173,9 +193,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void addOrUpdateBuilding(Property prop, String building, int current, int max, int[] past, String[] times) {
+    private void addOrUpdateBuilding(Property prop, String building, int current, int max, int notifyID, int[] past, String[] times) {
         if (!prop.updateBuilding(building, current, past, times)) //already exists
-            prop.addBuilding(new Building(building, prop, 1, current, max, past, times));
+            prop.addBuilding(new Building(building, prop, 1, current, max, notifyID, past, times));
     }
 
     private void addProperty(String name) {
