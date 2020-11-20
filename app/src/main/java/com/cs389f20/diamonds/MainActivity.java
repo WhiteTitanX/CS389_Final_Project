@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
     //TODO: app icon
     //TODO: get max capacity from db
+    //TODO: notifications shouldn't be going off when the BuildingActivity is active
+    //TODO: currently, notifications aren't triggered when the buildingactivity is destroyed.
+    // need to store and call check (move ot building) from MainActivity (or new activity), and hope that isn't destroyed.
 
     @Override
     @SuppressWarnings("unchecked")
