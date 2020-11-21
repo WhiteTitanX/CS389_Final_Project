@@ -1,6 +1,5 @@
 package com.cs389f20.diamonds;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +27,6 @@ public class BuildingActivity extends AppCompatActivity {
     private Building building;
     private Handler handler;
     private Runnable lastUpdateTask;
-    private NotificationCompat.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,55 +68,27 @@ public class BuildingActivity extends AppCompatActivity {
         dropdown.setAdapter(adapter);
         dropdown.setOnItemSelectedListener(dropdown(items));
         //if a notification is active, set default of dropdown to that level
-        if (building.isNotificationActive) {
-            String text = building.notificationType;
-            if (text.contains("zero"))
-                dropdown.setSelection(1);
-            else if (text.contains("below"))
-                dropdown.setSelection(2);
-            else if (text.contains("above"))
-                dropdown.setSelection(3);
-            else if (text.contains("maximum"))
-                dropdown.setSelection(4);
-        }
+        OccupancyAlertManager.NotificationType type = building.notificationType;
+        if (type == OccupancyAlertManager.NotificationType.ZERO)
+            dropdown.setSelection(1);
+        else if (type == OccupancyAlertManager.NotificationType.BELOW)
+            dropdown.setSelection(2);
+        else if (type == OccupancyAlertManager.NotificationType.ABOVE)
+            dropdown.setSelection(3);
+        else if (type == OccupancyAlertManager.NotificationType.MAX)
+            dropdown.setSelection(4);
     }
 
-    private void createNotification(int percent) //0 = zero, 49 = below 50%, 51 = above 50%, 100 = (above) max
-    {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        String msg;
-        if (percent == -1) {
-            notificationManager.cancel(building.notificationID);
-            building.isNotificationActive = false;
-            building.notificationType = "";
-            return;
-        } else if (percent == 0)
-            msg = "zero";
-        else if (percent == 49)
-            msg = "below 50%";
-        else if (percent == 51)
-            msg = "above 50%";
-        else
-            msg = "at or above maximum";
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        builder = new NotificationCompat.Builder(this, MainActivity.NOTIFICATION_CHANNEL)
-                .setSmallIcon(R.drawable.default_building)
-                .setContentTitle(building.name + " Capacity Alert")
-                .setContentText("The building has reached " + msg + " capacity")
-                .setContentIntent(pendingIntent)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        building.isNotificationActive = true;
-        building.notificationType = msg;
-    }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        if (building != null)
+        if (building != null) {
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, building);
+            if (building.notificationType != null)
+                savedInstanceState.putSerializable("BUILDING_NOTIFICATION_TYPE", building.notificationType);
+        }
+
     }
 
     //For when we are clicking the options back arrow (top left) on a activity with a parent, as it won't properly save the state on onCreate() w/o this
@@ -199,22 +167,6 @@ public class BuildingActivity extends AppCompatActivity {
             lastUpdated.setText(getString(R.string.last_updated_time, time, unit));
         }
         displayCapacity();
-        checkNotification();
-    }
-
-    private void checkNotification() {
-        //get notification for this building. if doesn't exist, return.
-        //if the notification requirements is met, call notify.
-        if (!building.isNotificationActive || builder == null)
-            return;
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        String text = building.notificationType;
-        if ((text.contains("zero") && building.currentNumberOfPeople == 0) ||
-                (text.contains("below") && building.currentNumberOfPeople <= building.maxOccupancy / 2) ||
-                (text.contains("above") && building.currentNumberOfPeople > building.maxOccupancy / 2) ||
-                (text.contains("maximum") && building.currentNumberOfPeople >= building.maxOccupancy)
-        )
-            notificationManager.notify(building.notificationID, builder.build());
     }
 
     @Override
@@ -232,15 +184,15 @@ public class BuildingActivity extends AppCompatActivity {
                 Object item = adapterView.getItemAtPosition(position);
                 if (item != null)
                     if (item.toString().equals(items[1]))
-                        createNotification(0);
+                        OccupancyAlertManager.getInstance().add(building, OccupancyAlertManager.NotificationType.ZERO);
                     else if (item.toString().equals(items[2]))
-                        createNotification(49);
+                        OccupancyAlertManager.getInstance().add(building, OccupancyAlertManager.NotificationType.BELOW);
                     else if (item.toString().equals(items[3]))
-                        createNotification(51);
+                        OccupancyAlertManager.getInstance().add(building, OccupancyAlertManager.NotificationType.ABOVE);
                     else if (item.toString().equals(items[4]))
-                        createNotification(100);
+                        OccupancyAlertManager.getInstance().add(building, OccupancyAlertManager.NotificationType.MAX);
                     else
-                        createNotification(-1); //remove
+                        OccupancyAlertManager.getInstance().add(building, null); //remove
             }
 
             @Override

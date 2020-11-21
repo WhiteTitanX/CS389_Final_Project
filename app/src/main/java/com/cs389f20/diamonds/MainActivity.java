@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private HashMap<String, Property> properties;
     private DBManager db;
+    private OccupancyAlertManager oam;
     private static MainActivity ma;
     private Handler handler;
     private Runnable dbUpdater;
@@ -41,9 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     //TODO: app icon
     //TODO: get max capacity from db
-    //TODO: notifications shouldn't be going off when the BuildingActivity is active
-    //TODO: currently, notifications aren't triggered when the buildingactivity is destroyed.
-    // need to store and call check (move ot building) from MainActivity (or new activity), and hope that isn't destroyed.
+    //TODO: finish notifications
+
+    //NOTIFICATIONS
+    //- Test to see if handler task is working when activity is dead.
+    //- Timing for new handler task: should it be every 2 mins or 5 mins?
+    //- When clicking on notification, we should try to go directly to building?
+    //- better icon
 
     @Override
     @SuppressWarnings("unchecked")
@@ -53,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         db = new DBManager(this);
-
+        oam = new OccupancyAlertManager();
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
         if (savedInstanceState != null) {
             try {
@@ -118,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         if (dbUpdater != null)
             handler.removeCallbacks(dbUpdater);
         db.destroyDBHandler();
+        Log.d(LOG_TAG, "Destroying MainActivity");
+
     }
 
     public void storeData(JSONObject stringResponse, JSONArray arrayResponse) {
