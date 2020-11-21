@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     private HashMap<String, Property> properties;
     private DBManager db;
-    private OccupancyAlertManager oam;
     private static MainActivity ma;
     private Handler handler;
     private Runnable dbUpdater;
@@ -40,15 +39,14 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: app icon
     //TODO: get max capacity from db
     //TODO: finish notifications
+    //todo: bug w duplicating properties. on connection to database?
 
     //NOTIFICATIONS
     //- Test to see if handler task is working when activity is dead.
-    //- Timing for new handler task: should it be every 2 mins or 5 mins?
     //- When clicking on notification, we should try to go directly to building?
-    //- better icon
+    //- use myLoop instead of main loop for checker in constructor of OccupancyAlertManager (and test)
 
     @Override
     @SuppressWarnings("unchecked")
@@ -58,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         db = new DBManager(this);
-        oam = new OccupancyAlertManager();
+        new OccupancyAlertManager();
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
         if (savedInstanceState != null) {
             try {

@@ -60,17 +60,19 @@ public class DrawButtons {
 
 
             //Button Image & Clickable NOTE: Currently db doesn't support images, so it is hard-coded
-            if (b != null)
+            if (b != null) {
                 if (b.name.equalsIgnoreCase("Miller"))
                     btn.setImageResource(R.drawable.pace_miller);
                 else if (b.name.equalsIgnoreCase("Willcox"))
                     btn.setImageResource(R.drawable.willcox_hall);
                 else
                     btn.setImageResource(R.drawable.default_building);
-            else if (p.name.equalsIgnoreCase("Pace"))
-                btn.setImageResource(R.drawable.pace);
-            else
-                btn.setImageResource(R.drawable.default_property);
+            } else {
+                if (p.name.equalsIgnoreCase("Pace"))
+                    btn.setImageResource(R.drawable.pace);
+                else
+                    btn.setImageResource(R.drawable.default_property);
+            }
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

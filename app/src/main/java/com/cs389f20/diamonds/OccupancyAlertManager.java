@@ -2,6 +2,7 @@ package com.cs389f20.diamonds;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -102,7 +103,9 @@ public class OccupancyAlertManager {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     PendingIntent pendingIntent = PendingIntent.getActivity(ma, 0, intent, 0);
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(ma, MainActivity.NOTIFICATION_CHANNEL)
-                            .setSmallIcon(R.drawable.default_building) //TODO: add better icon
+                            .setSmallIcon(R.drawable.app_notification_icon)
+                            .setLargeIcon(BitmapFactory.decodeResource(ma.getResources(),
+                                    R.drawable.app_notification_icon))
                             .setContentTitle(b.name + " Occupancy Alert")
                             .setContentText("The building has reached " + getMessage(type) + " occupancy")
                             .setContentIntent(pendingIntent)
