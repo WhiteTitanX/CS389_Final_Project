@@ -33,6 +33,7 @@ public class OccupancyAlertManager {
         HandlerThread checkerThread = new HandlerThread("OccupancyAlertThread");
         checkerThread.start();
         handler = new Handler(checkerThread.getLooper());
+        Log.d(OccupancyAlertManager.class.getSimpleName(), "now checking if an occupancy notification should notify (trigger) every " + INTERVAL + " minutes");
         check();
     }
 
@@ -61,7 +62,7 @@ public class OccupancyAlertManager {
             remove(building);
             return;
         }
-        Log.d(OccupancyAlertManager.class.getSimpleName(), "adding notification for " + building.name + " type: " + type);
+        Log.d(OccupancyAlertManager.class.getSimpleName(), "adding notification for " + building.name + ". type: " + type);
         if (type == NotificationType.ZERO)
             building.notificationType = OccupancyAlertManager.NotificationType.ZERO;
         else if (type == NotificationType.BELOW)
@@ -94,37 +95,30 @@ public class OccupancyAlertManager {
         //get notification for this building. if doesn't exist, return.
         //if the notification requirements is met, call notify.
         Log.d(OccupancyAlertManager.class.getSimpleName(), "Checking notifications for building " + b.name + ". target type: " + b.notificationType);
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ma);
-                NotificationType type = b.notificationType;
-                if ((type == NotificationType.ZERO && b.currentNumberOfPeople == 0) ||
-                        (type == NotificationType.BELOW && b.currentNumberOfPeople <= b.maxOccupancy / 2) ||
-                        (type == NotificationType.ABOVE && b.currentNumberOfPeople > b.maxOccupancy / 2) ||
-                        (type == NotificationType.MAX && b.currentNumberOfPeople >= b.maxOccupancy)
-                ) {
-                    Intent intent = new Intent(ma, MainActivity.class);
-                    //    intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, b); //for directly launching to BuildingActivity (but back button will exit out of app)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(ma, 0, intent, 0);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(ma, MainActivity.NOTIFICATION_CHANNEL)
-                            .setSmallIcon(R.drawable.app_notification_icon)
-                            .setLargeIcon(BitmapFactory.decodeResource(ma.getResources(),
-                                    R.drawable.app_notification_icon))
-                            .setContentTitle(b.name + " Occupancy Alert")
-                            .setContentText("The building has reached " + getMessage(type) + " occupancy")
-                            .setContentIntent(pendingIntent)
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                    notificationManager.notify(b.notificationID, builder.build());
-                    remove(b); //once the notification is activated, we no longer need to keep track of it
-                }
-            }
-        });
-        t.start();
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ma);
+        NotificationType type = b.notificationType;
+        if ((type == NotificationType.ZERO && b.currentNumberOfPeople == 0) ||
+                (type == NotificationType.BELOW && b.currentNumberOfPeople <= b.maxOccupancy / 2) ||
+                (type == NotificationType.ABOVE && b.currentNumberOfPeople > b.maxOccupancy / 2) ||
+                (type == NotificationType.MAX && b.currentNumberOfPeople >= b.maxOccupancy)
+        ) {
+            Intent intent = new Intent(ma, MainActivity.class);
+            //    intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, b); //for directly launching to BuildingActivity (but back button will exit out of app)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(ma, 0, intent, 0);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(ma, MainActivity.NOTIFICATION_CHANNEL)
+                    .setSmallIcon(R.drawable.app_notification_icon)
+                    .setLargeIcon(BitmapFactory.decodeResource(ma.getResources(),
+                            R.drawable.app_notification_icon))
+                    .setContentTitle(b.name + " Occupancy Alert")
+                    .setContentText("The building has reached " + getMessage(type) + " occupancy")
+                    .setContentIntent(pendingIntent)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            notificationManager.notify(b.notificationID, builder.build());
+            remove(b); //once the notification is activated, we no longer need to keep track of it
+        }
     }
-
 
     private String getMessage(NotificationType type) {
         switch (type) {
@@ -152,5 +146,4 @@ public class OccupancyAlertManager {
     public enum NotificationType implements java.io.Serializable {
         ZERO, BELOW, ABOVE, MAX
     }
-
 }

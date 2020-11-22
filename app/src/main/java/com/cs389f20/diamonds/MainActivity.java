@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
         if (savedInstanceState != null) {
             try {
@@ -66,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             new OccupancyAlertManager();
             db = new DBManager(this);
-
             properties = new HashMap<>();
             findViewById(R.id.propertySelectHeader).setVisibility(View.INVISIBLE);
             findViewById(R.id.loadBar).setVisibility(View.VISIBLE);
@@ -96,8 +94,7 @@ public class MainActivity extends AppCompatActivity {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+            // Register the channel with the system; don't change any notification behaviours or importance afterwards
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
