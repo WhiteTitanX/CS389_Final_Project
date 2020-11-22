@@ -40,13 +40,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //TODO: get max capacity from db
-    //TODO: finish notifications
-    //todo: bug w duplicating properties. on connection to database?
-
-    //NOTIFICATIONS
-    //- Test to see if handler task is working when activity is dead.
-    //- When clicking on notification, we should try to go directly to building?
-    //- use myLoop instead of main loop for checker in constructor of OccupancyAlertManager (and test)
 
     @Override
     @SuppressWarnings("unchecked")
@@ -55,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        db = new DBManager(this);
-        new OccupancyAlertManager();
+
         //if we are recreating a previous saved state (the back button on BuildingSelectActivity)
         if (savedInstanceState != null) {
             try {
@@ -68,8 +60,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             findViewById(R.id.loadBar).setVisibility(View.INVISIBLE);
-            //need to update property selection buttons (not a priority as only one property right now)
+            if (db == null)
+                db = new DBManager(this);
+
         } else {
+            new OccupancyAlertManager();
+            db = new DBManager(this);
+
             properties = new HashMap<>();
             findViewById(R.id.propertySelectHeader).setVisibility(View.INVISIBLE);
             findViewById(R.id.loadBar).setVisibility(View.VISIBLE);
@@ -111,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         if (properties != null)
             savedInstanceState.putSerializable(SERIALIZABLE_KEY, properties);
+
     }
 
     @Override
@@ -121,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
         if (dbUpdater != null)
             handler.removeCallbacks(dbUpdater);
         db.destroyDBHandler();
-        Log.d(LOG_TAG, "Destroying MainActivity");
-
     }
 
     public void storeData(JSONObject stringResponse, JSONArray arrayResponse) {
@@ -196,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
             }
             if (arrayResponse == null)
                 DrawButtons.drawButtons(properties.values().iterator(), (LinearLayout) findViewById(R.id.propertyScrollLayout));
-            //(RelativeLayout) findViewById(R.id.propertySelectLayout)
         }
 
     }
@@ -221,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Property " + propertyName + " selected. Launching BuildingSelectActivity.");
         Intent intent = new Intent(this, BuildingSelectActivity.class);
         intent.putExtra(EXTRA_PROPERTY, property);
-
         startActivity(intent);
     }
 

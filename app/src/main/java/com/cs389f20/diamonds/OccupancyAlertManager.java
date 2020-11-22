@@ -4,7 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.os.Looper;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OccupancyAlertManager {
     private static OccupancyAlertManager oam;
-    private final int INTERVAL = 5;
+    private final int INTERVAL = MainActivity.REFRESH_INTERVAL;
     private List<Building> notificationBuildings;
     private Handler handler;
     private Runnable checker;
@@ -25,8 +25,14 @@ public class OccupancyAlertManager {
     public OccupancyAlertManager() {
         oam = this;
         ma = MainActivity.getInstance();
-        handler = new Handler(Looper.getMainLooper());
         notificationBuildings = new ArrayList<>();
+        setup();
+    }
+
+    private void setup() {
+        HandlerThread checkerThread = new HandlerThread("OccupancyAlertThread");
+        checkerThread.start();
+        handler = new Handler(checkerThread.getLooper());
         check();
     }
 
@@ -41,7 +47,7 @@ public class OccupancyAlertManager {
                 for (Building b : notificationBuildings) {
                     checkNotification(b);
                 }
-                if (handler != null) //if null, we already destroyed this
+                if (handler != null) //just in case runnable is active just as we destroy the handler
                     handler.postDelayed(this, TimeUnit.MINUTES.toMillis(INTERVAL));
             }
         };
@@ -49,13 +55,14 @@ public class OccupancyAlertManager {
     }
 
     public void add(Building building, NotificationType type) {
-        Log.d(OccupancyAlertManager.class.getSimpleName(), "adding notification for " + building.name + " type: " + type);
         if (type == null) {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ma);
             notificationManager.cancel(building.notificationID);
             remove(building);
             return;
-        } else if (type == NotificationType.ZERO)
+        }
+        Log.d(OccupancyAlertManager.class.getSimpleName(), "adding notification for " + building.name + " type: " + type);
+        if (type == NotificationType.ZERO)
             building.notificationType = OccupancyAlertManager.NotificationType.ZERO;
         else if (type == NotificationType.BELOW)
             building.notificationType = OccupancyAlertManager.NotificationType.BELOW;
@@ -69,10 +76,9 @@ public class OccupancyAlertManager {
             notificationBuildings.remove(building); //delete the first copy after adding the new.
         } else
             notificationBuildings.add(building);
-        if (handler == null) {
-            handler = new Handler(Looper.getMainLooper());
-            check();
-        }
+
+        if (handler == null)
+            setup();
     }
 
     public void remove(Building b) {
@@ -87,8 +93,7 @@ public class OccupancyAlertManager {
     private void checkNotification(final Building b) {
         //get notification for this building. if doesn't exist, return.
         //if the notification requirements is met, call notify.
-        Log.d(OccupancyAlertManager.class.getSimpleName(), "Checking notifications for building " + b.name + " target type: " + b.notificationType);
-
+        Log.d(OccupancyAlertManager.class.getSimpleName(), "Checking notifications for building " + b.name + ". target type: " + b.notificationType);
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -99,7 +104,8 @@ public class OccupancyAlertManager {
                         (type == NotificationType.ABOVE && b.currentNumberOfPeople > b.maxOccupancy / 2) ||
                         (type == NotificationType.MAX && b.currentNumberOfPeople >= b.maxOccupancy)
                 ) {
-                    Intent intent = new Intent(ma, MainActivity.class); //TODO: launch BuildingActivity instead
+                    Intent intent = new Intent(ma, MainActivity.class);
+                    //    intent.putExtra(BuildingSelectActivity.EXTRA_BUILDING, b); //for directly launching to BuildingActivity (but back button will exit out of app)
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     PendingIntent pendingIntent = PendingIntent.getActivity(ma, 0, intent, 0);
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(ma, MainActivity.NOTIFICATION_CHANNEL)
@@ -119,6 +125,7 @@ public class OccupancyAlertManager {
         t.start();
     }
 
+
     private String getMessage(NotificationType type) {
         switch (type) {
             case ZERO:
@@ -137,6 +144,7 @@ public class OccupancyAlertManager {
     public void destroyHandler() {
         if (checker != null && handler != null) {
             handler.removeCallbacks(checker);
+            handler.getLooper().quit();
             handler = null;
         }
     }
