@@ -1,5 +1,7 @@
 package com.cs389f20.diamonds;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -84,6 +86,8 @@ public class DrawButtons {
             layout.addView(btn, params[0]);
             layout.addView(tv, params[1]);
         }
+        if (layout.getVisibility() == View.INVISIBLE)
+            layout.setVisibility(View.VISIBLE);
     }
 
     final static int IMAGE_MARGIN_TOP = 75, TEXT_MARGIN_TOP = 5;
@@ -108,16 +112,15 @@ public class DrawButtons {
             public void run() {
                 try {
                     InputStream is = (InputStream) new URL(url).getContent();
-                    Log.d("DrawButtons", url);
                     final Drawable d = Drawable.createFromStream(is, null);
+                    Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+                    final Drawable d2 = new BitmapDrawable(BuildingSelectActivity.getInstance().getResources(),
+                            Bitmap.createScaledBitmap(bitmap, 512, 512, true));
                     Handler handler = new android.os.Handler(Looper.getMainLooper());
                     Runnable img = new Runnable() {
                         @Override
                         public void run() {
-                            if (d != null) {
-                                d.setBounds(5, 5, 5, 5);
-                                btn.setImageDrawable(d);
-                            }
+                            btn.setImageDrawable(d2);
                         }
                     };
                     handler.post(img);

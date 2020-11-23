@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
         ma = this;
     }
 
-    //TODO: fix image being wrong size
-
     @Override
     @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
             new OccupancyAlertManager();
             db = new DBManager(this);
             properties = new HashMap<>();
-            //Connect to the database
-            db.connectToDatabase();
             //Sets up the recurring task of getting updated values from the database every REFRESH_INTERVAL. Only called on first time starting the app.
             handler = new Handler(Looper.getMainLooper());
             dbUpdater = new Runnable() {
@@ -77,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     handler.postDelayed(this, TimeUnit.MINUTES.toMillis(REFRESH_INTERVAL));
                 }
             };
-            handler.postDelayed(dbUpdater, TimeUnit.MINUTES.toMillis(REFRESH_INTERVAL));
+            handler.post(dbUpdater);
             createNotificationChannel();
         }
     }
@@ -108,8 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+        // Create the NotificationChannel, but only for API 26+ (API 25 and below don't need it)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "CHANNEL_ENTRYTRACK";
             String description = "Notifications for EntryTrack";
@@ -140,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void storeData(final JSONObject stringResponse, final JSONArray arrayResponse, final DBManager.DataType type) {
-        Log.d(LOG_TAG, "Updating or creating locally stored data for " + type);
         Runnable main = new Runnable() {
             @Override
             public void run() {

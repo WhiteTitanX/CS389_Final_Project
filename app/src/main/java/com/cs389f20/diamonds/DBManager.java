@@ -45,7 +45,7 @@ public class DBManager {
                 queue = Volley.newRequestQueue(ma);
                 future = RequestFuture.newFuture();
                 connectToDatabase(DataType.INFO);
-                //Other calls for different types are done after adding each type to the queue (has to do with future not syncing properly)
+                //Other calls for different types are done after adding each type to the queue (has to do with future not syncing properly & JSONArray being a different object)
             }
         };
         t.start();
@@ -53,7 +53,7 @@ public class DBManager {
 
     private void connectToDatabase(final DataType type) {
         final String url = getURL(type);
-        Log.d(LOG_TAG, "Connecting, Type is " + type);
+        Log.d(LOG_TAG, "Connecting to database for " + type);
         try {
             if (type == DataType.INFO) {
                 JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, future, errorResponse(type)) {
