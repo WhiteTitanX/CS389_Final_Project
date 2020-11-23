@@ -88,7 +88,6 @@ public class BuildingActivity extends AppCompatActivity {
             if (building.notificationType != null)
                 savedInstanceState.putSerializable("BUILDING_NOTIFICATION_TYPE", building.notificationType);
         }
-
     }
 
     //For when we are clicking the options back arrow (top left) on a activity with a parent, as it won't properly save the state on onCreate() w/o this
@@ -128,6 +127,8 @@ public class BuildingActivity extends AppCompatActivity {
 
     private void displayAmount() {
         TextView people = findViewById(R.id.textAmount);
+        if (building == null)
+            Log.d(LOG_TAG, "fuck");
         people.setText(getString(R.string.people_amount, building.currentNumberOfPeople));
     }
 
@@ -158,8 +159,10 @@ public class BuildingActivity extends AppCompatActivity {
         {
             Log.d(LOG_TAG, "Updating amount (count) for " + building.name);
             building = ma.getBuilding(building);
-            if (building == null)
+            if (building == null) {
                 finish(); //the building was removed from the database
+                return;
+            }
             displayAmount();
             lastUpdated.setText(getString(R.string.last_updated_now));
         } else {

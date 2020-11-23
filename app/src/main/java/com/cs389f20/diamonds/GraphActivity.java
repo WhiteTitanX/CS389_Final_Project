@@ -1,11 +1,14 @@
 package com.cs389f20.diamonds;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -13,6 +16,7 @@ import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,12 +36,11 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void displaygraph(int minutes) {
-        final SimpleDateFormat adf = new SimpleDateFormat("hh:mm a");
+        @SuppressLint("SimpleDateFormat") final SimpleDateFormat adf = new SimpleDateFormat("hh:mm a");
         PastCount[] data = building.getPastArray(minutes);
 
-        if (data == null) //TODO Make error screen?
-        {
-            Log.e(HistoryActivity.class.getSimpleName(), "There is no past data for " + building.name);
+        if (data == null) {
+            Log.e(GraphActivity.class.getSimpleName(), "There is no past data for " + building.name);
             Toast.makeText(getApplicationContext(), "Error: No past data for " + building.name, Toast.LENGTH_LONG).show();
             finish();
             return;
@@ -45,12 +48,14 @@ public class GraphActivity extends AppCompatActivity {
         System.out.println(data.length);
         GraphView graph = findViewById(R.id.graph);
         // set date label formatter for x axis format (hh:mm am/pm)
-        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter()
-        {
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
             @Override
             public java.lang.String formatLabel(double value, boolean isValueX) {
-                if(isValueX) { return adf.format(new Date((long)value)); }
-                else{ return super.formatLabel(value, isValueX);}
+                if (isValueX) {
+                    return adf.format(new Date((long) value));
+                } else {
+                    return super.formatLabel(value, isValueX);
+                }
             }
         });
         //create datapoints for line

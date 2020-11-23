@@ -24,16 +24,23 @@ public class Property implements java.io.Serializable {
         return null;
     }
 
+    public Building getBuildingFromID(String id) {
+        for (int i = 0; i < buildings.size(); i++)
+            if (buildings.get(i).id.equalsIgnoreCase(id))
+                return buildings.get(i);
+        return null;
+    }
+
     public void addBuilding(Building b) {
         buildings.add(b);
     }
 
-    public boolean updateBuilding(String name, int newCount, int[] past, String[] times) {
+    public boolean updateBuilding(String id, int newCount, int[] past, String[] times) {
         try {
             if (newCount != -1)
-                getBuilding(name).setPeople(newCount);
+                getBuildingFromID(id).setPeople(newCount);
             else if (past != null && times != null)
-                getBuilding(name).setPastPeople(past, times);
+                getBuildingFromID(id).setPastPeople(past, times);
             else
                 return false;
             return true;
@@ -42,10 +49,11 @@ public class Property implements java.io.Serializable {
         }
     }
 
-    public boolean contains(String name) {
-        for (int i = 0; i < buildings.size(); i++)
-            if (buildings.get(i).name.equalsIgnoreCase(name))
+    public boolean contains(String id) {
+        for (int i = 0; i < buildings.size(); i++) {
+            if (buildings.get(i).id.equalsIgnoreCase(id))
                 return true;
+        }
         return false;
     }
 }

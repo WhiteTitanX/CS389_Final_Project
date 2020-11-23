@@ -25,7 +25,9 @@ public class HistoryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         building = (Building) intent.getSerializableExtra(BuildingSelectActivity.EXTRA_BUILDING);
         if (building == null) {
+            Log.e(HistoryActivity.class.getSimpleName(), "There is no past data for " + building.name);
             Toast.makeText(MainActivity.getInstance().getApplicationContext(), "ERROR: No building", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
         setTitle(getString((R.string.history_title), building.name));

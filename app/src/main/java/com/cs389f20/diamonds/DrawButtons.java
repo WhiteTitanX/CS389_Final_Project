@@ -1,5 +1,8 @@
 package com.cs389f20.diamonds;
 
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -7,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Iterator;
 
 public class DrawButtons {
@@ -51,20 +56,19 @@ public class DrawButtons {
 
             final String name = ((p != null) ? p.name : b.name);
 
-            //Button Image & Clickable NOTE: Custom images are local, everything else uses default image (in drawable)
+            //Button Image
             if (b != null) {
-                if (b.name.equalsIgnoreCase("Miller"))
-                    btn.setImageResource(R.drawable.pace_miller);
-                else if (b.name.equalsIgnoreCase("Willcox"))
-                    btn.setImageResource(R.drawable.willcox_hall);
-                else
-                    btn.setImageResource(R.drawable.default_building);
+                btn.setImageResource(R.drawable.default_building);
+                LoadImageFromWebOperations(btn, b.image_url);
+
             } else {
-                if (p.name.equalsIgnoreCase("Pace"))
+                if (p.name.equalsIgnoreCase("Pace University"))
                     btn.setImageResource(R.drawable.pace);
                 else
                     btn.setImageResource(R.drawable.default_property);
             }
+
+            //Button Clickable
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -96,5 +100,32 @@ public class DrawButtons {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         paramsText.setMargins(0, TEXT_MARGIN_TOP, 0, 0);
         return new LinearLayout.LayoutParams[]{paramsButton, paramsText};
+    }
+
+    private static void LoadImageFromWebOperations(final ImageButton btn, final String url) {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    InputStream is = (InputStream) new URL(url).getContent();
+                    Log.d("DrawButtons", url);
+                    final Drawable d = Drawable.createFromStream(is, null);
+                    Handler handler = new android.os.Handler(Looper.getMainLooper());
+                    Runnable img = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (d != null) {
+                                d.setBounds(5, 5, 5, 5);
+                                btn.setImageDrawable(d);
+                            }
+                        }
+                    };
+                    handler.post(img);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
     }
 }

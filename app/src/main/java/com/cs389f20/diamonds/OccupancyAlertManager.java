@@ -26,7 +26,6 @@ public class OccupancyAlertManager {
         oam = this;
         ma = MainActivity.getInstance();
         notificationBuildings = new ArrayList<>();
-        setup();
     }
 
     private void setup() {
