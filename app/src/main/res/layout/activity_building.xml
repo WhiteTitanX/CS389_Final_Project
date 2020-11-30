@@ -52,12 +52,11 @@
         android:id="@+id/textNotify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="48dp"
         android:text="@string/text_notify"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textlastUpdated" />
 
@@ -65,32 +64,36 @@
         android:id="@+id/buttonHistory"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:onClick="launchHistoryActivity"
         android:text="@string/button_show_history"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textNotify" />
+        app:layout_constraintTop_toBottomOf="@+id/spinnerNotify" />
 
     <Button
         android:id="@+id/buttonGraph"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:onClick="launchGraphActivity"
         android:text="@string/button_display_graph"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonHistory" />
+        app:layout_constraintStart_toEndOf="@+id/buttonHistory"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerNotify" />
 
     <Spinner
         android:id="@+id/spinnerNotify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="70dp"
-        app:layout_constraintStart_toEndOf="@+id/textNotify"
-        app:layout_constraintTop_toBottomOf="@+id/textlastUpdated" />
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#8C8787"
+        android:backgroundTintMode="add"
+        android:foregroundTint="#8C8787"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textNotify" />
 
     <TextView
         android:id="@+id/textCapacity"
@@ -98,6 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/capacity_text"
+        android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"

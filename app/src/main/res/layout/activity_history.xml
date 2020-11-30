@@ -11,11 +11,11 @@
         android:id="@+id/spinnerFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:gravity="center|start"
         android:spinnerMode="dropdown"
         android:textAlignment="viewStart"
+        app:layout_constraintEnd_toEndOf="@+id/averageText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filterText" />
 
@@ -23,11 +23,11 @@
         android:id="@+id/filterText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="@string/history_interval_text"
         android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/averageText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
         android:id="@+id/averageText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="@string/history_average"
         android:textAlignment="center"
@@ -47,6 +47,7 @@
         android:id="@+id/logText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:fontFamily="monospace"
         android:scrollbars="vertical"
         android:textAlignment="textStart"
