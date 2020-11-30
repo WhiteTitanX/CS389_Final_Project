@@ -68,7 +68,7 @@
         android:onClick="launchHistoryActivity"
         android:text="@string/button_show_history"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintHorizontal_bias="0.199"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerNotify" />
 
@@ -80,6 +80,7 @@
         android:onClick="launchGraphActivity"
         android:text="@string/button_display_graph"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
         app:layout_constraintStart_toEndOf="@+id/buttonHistory"
         app:layout_constraintTop_toBottomOf="@+id/spinnerNotify" />
 
