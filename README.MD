@@ -8,6 +8,9 @@
 ## Description
 An app that can count and display the number of people currently in a building that is setup with the app. This data can be used for health, cleaning, and scheduling reasons. The app uses a database and physical devices to gather, store, and display the data to the user.
 
+## Backend Code
+[Backend Github Repo](https://github.com/WhiteTitanX/CS389_Final_Project_Backend)
+
 ## Product Backlog
 [Product Backlog](https://docs.google.com/spreadsheets/d/1XMmwbVlVh8gB1OpuBe0HGFY8i2yRfqk7um02B8QV3A8)
 
